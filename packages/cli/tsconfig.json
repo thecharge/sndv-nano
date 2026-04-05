@@ -4,7 +4,7 @@
 		"baseUrl": "../..",
 		"composite": true,
 		"outDir": "dist",
-		"rootDir": "src",
+		"rootDir": ".",
 		"declaration": true,
 		"declarationMap": false
 	},
