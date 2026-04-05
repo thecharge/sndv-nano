@@ -42,7 +42,7 @@ graph TD
 | [memory](packages/memory/) | 3-tier memory: short-term (runtime), medium-term (sessions), long-term (patterns) |
 | [adapter](packages/adapter/) | fetch()-based LLM client, opencode adapter, prompt builder |
 | [qmd](packages/qmd/) | QMD parser + knowledge graph with search, cross-doc dependencies, persistence |
-| [cli](packages/cli/) | CLI: `sndv init`, `sndv run` (with LLM), `sndv status`, `sndv memory` |
+| [cli](packages/cli/) | CLI: `sndv init`, `sndv run`, `sndv propose`, `sndv task`, `sndv scaffold` |
 
 ---
 
@@ -168,18 +168,43 @@ await graph.loadIndex(".sndv/qmd-index.json");
 ## CLI
 
 ```bash
+sndv --version              # print version
+
 # Configure your LLM (any OpenAI-compatible endpoint)
 export SNDV_LLM_API_KEY="your-key"          # required for LLM mode
 export SNDV_LLM_BASE_URL="http://localhost:11434/v1"  # default: Ollama
 export SNDV_LLM_MODEL="llama3"              # default: "default"
 
+# Project setup
 sndv init --type greenfield --name my-feature
+sndv scaffold all           # generate CLAUDE.md, copilot-instructions.md, AGENTS.md
+
+# Let the LLM propose tasks from your goal
+sndv propose --goal "Build a rate limiter that survives burst traffic"
+sndv propose --goal-file vision.md   # read a large goal from a file
+sndv propose --goal "Add MFA" --append  # append tasks to existing protocol
+
+# Manage tasks directly
+sndv task list
+sndv task add --name verify_redis --risk 0.9 --description "Break the Redis pool"
+sndv task add --name verify_rate --risk 0.7 --depends-on verify_redis
+sndv task remove --name verify_rate
+
+# Run
 sndv run                    # LLM evaluates each task
 sndv run --no-llm           # offline mode
+sndv run --dry-run           # preview task graph without executing
+
+# Review
 sndv status                 # view hypotheses + patterns
 sndv memory --export my-id  # export context for external LLM
 sndv memory --patterns      # view institutional patterns
 sndv memory --graduate      # extract patterns from repeated failures
+
+# Archive and restore protocols
+sndv protocol list           # show current and archived protocols
+sndv protocol archive --name v1  # archive current protocol
+sndv protocol restore --name v1  # restore an archived protocol
 ```
 
 ---

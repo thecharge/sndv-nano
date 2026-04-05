@@ -2,22 +2,37 @@
 import { ProjectType } from "@thecharge/sndv-config";
 import { init } from "./commands/init";
 import { memory } from "./commands/memory";
+import { propose } from "./commands/propose";
+import { protocol } from "./commands/protocol";
 import { run } from "./commands/run";
+import { scaffold } from "./commands/scaffold";
 import { status } from "./commands/status";
+import { task } from "./commands/task";
 
-const USAGE = `sndv — SMEP CLI
+const VERSION = "0.1.0";
+
+const USAGE = `sndv — SMEP CLI (v${VERSION})
 
 Usage:
   sndv init [--type greenfield|brownfield] [--name project-name]
-  sndv run [--qmd path/to/protocol.qmd] [--dry-run] [--no-llm]
+  sndv run [--qmd path] [--dry-run] [--no-llm]
   sndv status
-  sndv memory [--export hypothesis-id] [--patterns] [--graduate]
+  sndv memory [--export id] [--patterns] [--graduate]
+  sndv task <list|add|remove> [--name n] [--risk 0.9] [--depends-on a,b]
+  sndv protocol <list|archive|restore> [--name n]
+  sndv propose --goal <text> | --goal-file <path> [--append]
+  sndv scaffold <claude|copilot|opencode|all>
+  sndv --version
 
 Commands:
-  init     Create a new SMEP project in the current directory
-  run      Execute protocol — with LLM by default, --no-llm for offline
-  status   Show project status and memory summary
-  memory   Inspect and manage memory (export for LLM, view patterns)
+  init       Create a new SMEP project in the current directory
+  run        Execute protocol — with LLM by default, --no-llm for offline
+  status     Show project status and memory summary
+  memory     Inspect and manage memory (export, patterns, graduate)
+  task       Add, remove, or list tasks in the protocol
+  protocol   Archive, restore, or list protocols
+  propose    Ask the LLM to decompose a goal into falsification tasks
+  scaffold   Generate agent instruction files (CLAUDE.md, copilot, AGENTS.md)
 
 Environment (vendor-agnostic):
   SNDV_LLM_API_KEY    API key for any OpenAI-compatible endpoint
@@ -37,6 +52,11 @@ const flag = (name: string): string | undefined => {
 const hasFlag = (name: string): boolean => args.includes(`--${name}`);
 
 const main = async (): Promise<void> => {
+	if (command === "--version" || command === "-v") {
+		console.log(`sndv v${VERSION}`);
+		return;
+	}
+
 	if (command === "init") {
 		const projectType = (flag("type") ?? ProjectType.GREENFIELD) as ProjectType;
 		const projectName = flag("name");
@@ -74,6 +94,49 @@ const main = async (): Promise<void> => {
 			patterns: showPatterns,
 			graduate: shouldGraduate,
 		});
+		console.log(output);
+		return;
+	}
+
+	if (command === "task") {
+		const action = args[1] ?? "";
+		const output = await task({
+			projectDir: currentWorkingDir,
+			action,
+			name: flag("name"),
+			risk: flag("risk"),
+			dependsOn: flag("depends-on"),
+			description: flag("description"),
+		});
+		console.log(output);
+		return;
+	}
+
+	if (command === "protocol") {
+		const action = args[1] ?? "";
+		const output = await protocol({
+			projectDir: currentWorkingDir,
+			action,
+			name: flag("name"),
+		});
+		console.log(output);
+		return;
+	}
+
+	if (command === "propose") {
+		const output = await propose({
+			projectDir: currentWorkingDir,
+			goal: flag("goal"),
+			goalFile: flag("goal-file"),
+			append: hasFlag("append"),
+		});
+		console.log(output);
+		return;
+	}
+
+	if (command === "scaffold") {
+		const target = args[1] ?? "";
+		const output = await scaffold({ projectDir: currentWorkingDir, target });
 		console.log(output);
 		return;
 	}

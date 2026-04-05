@@ -95,6 +95,29 @@ Try to exceed the rate limit with burst patterns.
 
 Tasks are ordered by `risk` (0.0–1.0). Higher risk = evaluate first. If a task is falsified, skip all dependents.
 
+Alternatively, let the LLM decompose a goal into tasks:
+
+```bash
+# Provide a goal — the LLM proposes risk-ordered falsification tasks
+sndv propose --goal "Build a rate limiter that survives burst traffic"
+
+# Or read a large goal from a file (PRD, product vision, etc.)
+sndv propose --goal-file prd.md
+
+# Append LLM-proposed tasks to an existing protocol
+sndv propose --goal "Add MFA support" --append
+```
+
+You can also add and remove tasks directly:
+
+```bash
+sndv task list
+sndv task add --name verify_redis --risk 0.9 --description "Break the Redis pool"
+sndv task remove --name verify_redis
+```
+
+Review and edit the generated protocol.qmd before running.
+
 ### Step 3: Evaluate
 
 Two modes:
@@ -151,6 +174,19 @@ flowchart LR
 ```
 
 The agent does **not** run `sndv run` (which calls a second LLM). It runs `sndv run --no-llm` or reads the protocol directly.
+
+## Quick setup (scaffolded)
+
+Instead of creating instruction files manually, run:
+
+```bash
+sndv scaffold all       # generates CLAUDE.md + copilot-instructions.md + AGENTS.md
+sndv scaffold claude    # only CLAUDE.md
+sndv scaffold copilot   # only .github/copilot-instructions.md
+sndv scaffold opencode  # only AGENTS.md
+```
+
+This writes ready-to-use instruction files for each agent. The rest of this guide explains what goes in these files if you want to customize them.
 
 ## Claude Code
 
