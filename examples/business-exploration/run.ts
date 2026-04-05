@@ -6,7 +6,7 @@
  *
  * Run: bun run examples/business-exploration/run.ts
  */
-import { Protocol, summary, type TaskContext } from "@thecharge/sndv-nano";
+import { Protocol, summary, type TaskContextInterface } from "@thecharge/sndv-nano";
 
 const protocol = new Protocol(
 	{
@@ -22,7 +22,7 @@ const protocol = new Protocol(
 );
 
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const competitors = ["GitHub Copilot", "CodeRabbit", "Codacy", "SonarCloud"];
 		const differentiation = "Security-focused review with compliance reporting";
 		const isUnique = !competitors.some((c) => c.includes("compliance"));
@@ -37,7 +37,7 @@ protocol.addTask(
 );
 
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const teamsGlobal = 200_000;
 		const relevantSegment = 0.3;
 		const willingToPay = 0.1;
@@ -55,7 +55,7 @@ protocol.addTask(
 );
 
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const avgTokensPerReview = 8000;
 		const costPer1kTokens = 0.01;
 		const reviewsPerSeatPerMonth = 40;
@@ -74,7 +74,7 @@ protocol.addTask(
 );
 
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const monthlyChurn = 0.08;
 		const expansionRevenue = 0.03;
 		const netChurn = monthlyChurn - expansionRevenue;

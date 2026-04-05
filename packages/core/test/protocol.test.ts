@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { Protocol, summary, type TaskContext } from "../src/index";
+import { Protocol, summary, type TaskContextInterface } from "../src/index";
 
 describe("Protocol", () => {
 	// ===== Happy flows =====
@@ -8,14 +8,14 @@ describe("Protocol", () => {
 		const p = new Protocol({ goal: "Test", constraints: ["no bugs"] });
 
 		p.addTask(
-			async (ctx: TaskContext) => {
+			async (ctx: TaskContextInterface) => {
 				ctx.evidence("result", "ok");
 			},
 			{ name: "task_a", risk: 0.9 },
 		);
 
 		p.addTask(
-			async (ctx: TaskContext) => {
+			async (ctx: TaskContextInterface) => {
 				ctx.evidence("result", "ok");
 			},
 			{ name: "task_b", risk: 0.5, dependsOn: ["task_a"] },
@@ -53,7 +53,7 @@ describe("Protocol", () => {
 		const p = new Protocol({ goal: "Evidence test" });
 
 		p.addTask(
-			async (ctx: TaskContext) => {
+			async (ctx: TaskContextInterface) => {
 				ctx.evidence("metric", 42);
 				ctx.evidence("label", "ok");
 			},
@@ -71,7 +71,7 @@ describe("Protocol", () => {
 		const p = new Protocol({ goal: "Prune test" });
 
 		p.addTask(
-			async (ctx: TaskContext) => {
+			async (ctx: TaskContextInterface) => {
 				ctx.falsify("broken");
 			},
 			{ name: "root", risk: 0.9 },
@@ -152,7 +152,7 @@ describe("Protocol", () => {
 
 	test("summary produces readable output", async () => {
 		const p = new Protocol({ goal: "Summary test", constraints: ["no bugs"] });
-		p.addTask(async (ctx: TaskContext) => ctx.evidence("x", 1), { name: "t1" });
+		p.addTask(async (ctx: TaskContextInterface) => ctx.evidence("x", 1), { name: "t1" });
 
 		const report = await p.execute();
 		const text = summary(report);

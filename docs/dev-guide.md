@@ -152,6 +152,13 @@ bun run packages/cli/src/index.ts init my-project
 bun run packages/cli/src/index.ts run
 bun run packages/cli/src/index.ts status
 bun run packages/cli/src/index.ts memory --patterns
+
+# Build and link a local sndv binary
+bun run build
+bun run packages/cli/src/index.ts link
+
+# Shell completion
+bun run packages/cli/src/index.ts completion bash
 ```
 
 ## LLM Configuration

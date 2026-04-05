@@ -81,6 +81,13 @@ class LlmResponseParseError extends Error {
 	}
 }
 
+class CliError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "CliError";
+	}
+}
+
 // ---------------------------------------------------------------------------
 // Type guards (used for catch blocks)
 // ---------------------------------------------------------------------------
@@ -163,6 +170,23 @@ export const SmepErrors = {
 
 	/** Skipped task message for pruned downstream. */
 	skippedDueToUpstream: () => "Skipped: upstream dependency failed",
+} as const;
+
+export const CliErrors = {
+	invalidCompletionFormat: (format: string) => new CliError(`Invalid completion format: ${format}`),
+	invalidTaskName: (maxLength: number) =>
+		new CliError(`Task name must be lowercase letters, numbers, or underscores (1-${maxLength}).`),
+	invalidRisk: () => new CliError("Task risk must be between 0 and 1."),
+	missingProtocol: () => new CliError("Error: protocol.qmd not found. Run `sndv init` first."),
+	duplicateTask: (taskName: string) => new CliError(`Task already exists: ${taskName}`),
+	unknownTask: (taskName: string) => new CliError(`Task not found: ${taskName}`),
+	invalidArchiveName: () =>
+		new CliError("Archive name must contain only letters, numbers, dashes, or underscores."),
+	archiveExists: (archiveName: string) => new CliError(`Archive already exists: ${archiveName}`),
+	archiveMissing: (archiveName: string) => new CliError(`Archive not found: ${archiveName}`),
+	linkTargetMissing: (targetPath: string) => new CliError(`Target binary missing: ${targetPath}`),
+	linkDirCreateFailed: (dirPath: string) => new CliError(`Failed to create directory: ${dirPath}`),
+	linkFailed: (linkPath: string) => new CliError(`Failed to create symlink at ${linkPath}`),
 } as const;
 
 // Re-export classes for instanceof checks in catch blocks

@@ -1,43 +1,67 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { MAX_TASK_NAME_LENGTH, SNDV_DIR_NAME } from "@thecharge/sndv-config";
+import {
+	buildTaskUsage,
+	CliErrors,
+	CliTaskAction,
+	MAX_TASK_NAME_LENGTH,
+	SNDV_DIR_NAME,
+} from "@thecharge/sndv-config";
 import { parseQmd } from "@thecharge/sndv-qmd";
+import type { Command } from "./command";
 
 export interface TaskOpts {
 	projectDir: string;
-	action: string;
+	action?: CliTaskAction;
 	name?: string;
 	risk?: string;
 	dependsOn?: string;
 	description?: string;
 }
 
-export const TASK_USAGE = `sndv task <action> [options]
+export class TaskCommand implements Command {
+	private readonly projectDir: string;
+	private readonly action?: CliTaskAction;
+	private readonly name?: string;
+	private readonly risk?: string;
+	private readonly dependsOn?: string;
+	private readonly description?: string;
 
-Actions:
-  list                      List all tasks in the protocol
-  add --name <n> [options]  Add a task to the protocol
-  remove --name <n>         Remove a task from the protocol
+	constructor(opts: TaskOpts) {
+		this.projectDir = opts.projectDir;
+		this.action = opts.action;
+		this.name = opts.name;
+		this.risk = opts.risk;
+		this.dependsOn = opts.dependsOn;
+		this.description = opts.description;
+	}
 
-Options (for add):
-  --name <name>             Task name (required)
-  --risk <0.0-1.0>          Risk score (default: 0.5)
-  --depends-on <a,b>        Comma-separated dependency names
-  --description <text>      What to try to break`;
-
-export const task = async (opts: TaskOpts): Promise<string> => {
-	if (opts.action === "list") return listTasks(opts.projectDir);
-	if (opts.action === "add") return addTask(opts);
-	if (opts.action === "remove") return removeTask(opts);
-	return TASK_USAGE;
-};
+	execute = async (): Promise<string> => {
+		if (!this.action) return buildTaskUsage();
+		if (this.action === CliTaskAction.LIST) return listTasks(this.projectDir);
+		if (this.action === CliTaskAction.ADD)
+			return addTask({
+				projectDir: this.projectDir,
+				name: this.name,
+				risk: this.risk,
+				dependsOn: this.dependsOn,
+				description: this.description,
+			});
+		if (this.action === CliTaskAction.REMOVE)
+			return removeTask({
+				projectDir: this.projectDir,
+				name: this.name,
+			});
+		return buildTaskUsage();
+	};
+}
 
 const qmdPath = (projectDir: string): string => join(projectDir, SNDV_DIR_NAME, "protocol.qmd");
 
 const listTasks = async (projectDir: string): Promise<string> => {
 	const filePath = qmdPath(projectDir);
 	const exists = await ensureQmdExists(filePath);
-	if (!exists) return "Error: protocol.qmd not found. Run `sndv init` first.";
+	if (!exists) return CliErrors.missingProtocol().message;
 
 	const doc = await parseQmd(filePath);
 	if (doc.tasks.length === 0) return "No tasks defined in protocol.qmd";
@@ -50,23 +74,21 @@ const listTasks = async (projectDir: string): Promise<string> => {
 };
 
 const addTask = async (opts: TaskOpts): Promise<string> => {
-	if (!opts.name) return "Error: --name is required for task add";
-	if (!isValidTaskName(opts.name)) {
-		return `Error: task name must be snake_case and <= ${MAX_TASK_NAME_LENGTH} chars`;
-	}
+	if (!opts.name) return CliErrors.invalidTaskName(MAX_TASK_NAME_LENGTH).message;
+	if (!isValidTaskName(opts.name)) return CliErrors.invalidTaskName(MAX_TASK_NAME_LENGTH).message;
 
 	const filePath = qmdPath(opts.projectDir);
 	const exists = await ensureQmdExists(filePath);
-	if (!exists) return "Error: protocol.qmd not found. Run `sndv init` first.";
+	if (!exists) return CliErrors.missingProtocol().message;
 
 	const raw = await readFile(filePath, "utf-8");
 
 	const doc = await parseQmd(filePath);
 	const existing = doc.tasks.find((t) => t.name === opts.name);
-	if (existing) return `Error: task "${opts.name}" already exists`;
+	if (existing) return CliErrors.duplicateTask(opts.name).message;
 
 	const risk = opts.risk ? parseFloat(opts.risk) : 0.5;
-	if (risk < 0 || risk > 1 || Number.isNaN(risk)) return "Error: risk must be between 0.0 and 1.0";
+	if (risk < 0 || risk > 1 || Number.isNaN(risk)) return CliErrors.invalidRisk().message;
 
 	const taskBlock = buildTaskBlock(opts.name, risk, opts.dependsOn, opts.description);
 	const updated = `${raw.trimEnd()}\n\n${taskBlock}\n`;
@@ -76,20 +98,18 @@ const addTask = async (opts: TaskOpts): Promise<string> => {
 };
 
 const removeTask = async (opts: TaskOpts): Promise<string> => {
-	if (!opts.name) return "Error: --name is required for task remove";
-	if (!isValidTaskName(opts.name)) {
-		return `Error: task name must be snake_case and <= ${MAX_TASK_NAME_LENGTH} chars`;
-	}
+	if (!opts.name) return CliErrors.invalidTaskName(MAX_TASK_NAME_LENGTH).message;
+	if (!isValidTaskName(opts.name)) return CliErrors.invalidTaskName(MAX_TASK_NAME_LENGTH).message;
 
 	const filePath = qmdPath(opts.projectDir);
 	const exists = await ensureQmdExists(filePath);
-	if (!exists) return "Error: protocol.qmd not found. Run `sndv init` first.";
+	if (!exists) return CliErrors.missingProtocol().message;
 
 	const raw = await readFile(filePath, "utf-8");
 
 	const doc = await parseQmd(filePath);
 	const existing = doc.tasks.find((t) => t.name === opts.name);
-	if (!existing) return `Error: task "${opts.name}" not found`;
+	if (!existing) return CliErrors.unknownTask(opts.name).message;
 
 	const taskPattern = new RegExp(
 		`\\n?# Task: ${escapeRegex(opts.name)}\\n[\\s\\S]*?(?=\\n# Task: |$)`,

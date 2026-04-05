@@ -24,14 +24,14 @@ graph TD
 ### Simple Protocol
 
 ```typescript
-import { Protocol, summary, type TaskContext } from "@thecharge/sndv-nano";
+import { Protocol, summary, type TaskContextInterface } from "@thecharge/sndv-nano";
 
 const protocol = new Protocol({
   goal: "Migrate auth to sessions",
   constraints: ["Zero downtime", "No API changes"],
 });
 
-protocol.addTask(async (ctx: TaskContext) => {
+protocol.addTask(async (ctx: TaskContextInterface) => {
   const latency = await benchmarkSessions();
   ctx.evidence("p99_ms", latency);
   if (latency > 50) ctx.falsify("Too slow");
@@ -44,7 +44,7 @@ console.log(summary(report));
 ### Double Loop (Falsify → Deliver → Verify)
 
 ```typescript
-import { DoubleLoop, type TaskContext } from "@thecharge/sndv-nano";
+import { DoubleLoop, type TaskContextInterface } from "@thecharge/sndv-nano";
 
 const loop = new DoubleLoop({ goal: "Build auth" }, { maxCycles: 3 });
 loop.addFalsify(async (ctx) => { ... }, { name: "attack_assumption" });

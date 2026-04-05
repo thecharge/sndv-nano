@@ -2,169 +2,67 @@
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ProjectType } from "@thecharge/sndv-config";
-import { completion } from "./commands/completion";
-import { init } from "./commands/init";
-import { memory } from "./commands/memory";
-import { propose } from "./commands/propose";
-import { protocol } from "./commands/protocol";
-import { run } from "./commands/run";
-import { scaffold } from "./commands/scaffold";
-import { status } from "./commands/status";
-import { task } from "./commands/task";
+import {
+	buildCliUsage,
+	CLI_COMMAND_ALIASES,
+	CliCommand,
+	CliCompletionFormat,
+	CliFlag,
+	CliProtocolAction,
+	CliScaffoldTarget,
+	CliTaskAction,
+	ProjectType,
+} from "@thecharge/sndv-config";
+import type { Command } from "./commands/command";
+import { CompletionCommand } from "./commands/completion";
+import { InitCommand } from "./commands/init";
+import { LinkCommand } from "./commands/link";
+import { MemoryCommand } from "./commands/memory";
+import { ProposeCommand } from "./commands/propose";
+import { ProtocolCommand } from "./commands/protocol";
+import { RunCommand } from "./commands/run";
+import { ScaffoldCommand } from "./commands/scaffold";
+import { StatusCommand } from "./commands/status";
+import { TaskCommand } from "./commands/task";
 
 const VERSION = resolveVersion();
-
-const USAGE = `sndv — SMEP CLI (v${VERSION})
-
-Usage:
-	sndv init [--type greenfield|brownfield] [--name project-name]
-	sndv run [--qmd path] [--dry-run] [--no-llm]
-	sndv status
-	sndv memory [--export id] [--patterns] [--graduate]
-	sndv task <list|add|remove> [--name n] [--risk 0.9] [--depends-on a,b]
-	sndv protocol <list|archive|restore> [--name n]
-	sndv propose --goal <text> | --goal-file <path> [--append] [--type greenfield|brownfield]
-	sndv scaffold <claude|copilot|opencode|all> [--force]
-	sndv completion <bash|zsh|fish>
-	sndv --version
-
-Commands:
-  init       Create a new SMEP project in the current directory
-  run        Execute protocol — with LLM by default, --no-llm for offline
-  status     Show project status and memory summary
-  memory     Inspect and manage memory (export, patterns, graduate)
-	task       Add, remove, or list tasks in the protocol
-	protocol   Archive, restore, or list protocols
-	propose    Ask the LLM to decompose a goal into falsification tasks
-	scaffold   Generate agent instruction files (CLAUDE.md, copilot, AGENTS.md)
-	completion Install shell autocompletion
-
-Environment (vendor-agnostic):
-  SNDV_LLM_API_KEY    API key for any OpenAI-compatible endpoint
-  SNDV_LLM_BASE_URL   Base URL (default: http://localhost:11434/v1)
-  SNDV_LLM_MODEL      Model name (default: "default")`;
+const USAGE = buildCliUsage(VERSION);
 
 const args = process.argv.slice(2);
-const command = args[0];
+const command = resolveCommand(args[0]);
 const currentWorkingDir = process.cwd();
 
-const flag = (name: string): string | undefined => {
-	const flagIndex = args.indexOf(`--${name}`);
+const flag = (name: CliFlag): string | undefined => {
+	const flagIndex = args.indexOf(name);
 	if (flagIndex === -1 || flagIndex + 1 >= args.length) return undefined;
 	return args[flagIndex + 1];
 };
 
-const hasFlag = (name: string): boolean => args.includes(`--${name}`);
+const hasFlag = (name: CliFlag): boolean => args.includes(name);
 
 const main = async (): Promise<void> => {
-	if (!command || command === "help" || command === "--help" || command === "-h") {
+	if (!command) {
 		console.log(USAGE);
 		return;
 	}
 
-	if (command === "--version" || command === "-v") {
+	if (command === CliCommand.HELP) {
+		console.log(USAGE);
+		return;
+	}
+
+	if (command === CliCommand.VERSION) {
 		console.log(`sndv v${VERSION}`);
 		return;
 	}
 
-	if (command === "init") {
-		const projectType = (flag("type") ?? ProjectType.GREENFIELD) as ProjectType;
-		const projectName = flag("name");
-		const createdPath = await init({
-			projectDir: currentWorkingDir,
-			type: projectType,
-			name: projectName,
-		});
-		console.log(`Initialized SMEP project at ${createdPath}`);
+	const commandInstance = buildCommand(command, args, currentWorkingDir);
+	if (!commandInstance) {
+		console.log(USAGE);
 		return;
 	}
-
-	if (command === "run") {
-		const qmdPath = flag("qmd");
-		const dryRun = hasFlag("dry-run");
-		const noLlm = hasFlag("no-llm");
-		const output = await run({ projectDir: currentWorkingDir, qmdPath, dryRun, noLlm });
-		console.log(output);
-		return;
-	}
-
-	if (command === "status") {
-		const output = await status({ projectDir: currentWorkingDir });
-		console.log(output);
-		return;
-	}
-
-	if (command === "memory") {
-		const exportId = flag("export");
-		const showPatterns = hasFlag("patterns");
-		const shouldGraduate = hasFlag("graduate");
-		const output = await memory({
-			projectDir: currentWorkingDir,
-			exportId,
-			patterns: showPatterns,
-			graduate: shouldGraduate,
-		});
-		console.log(output);
-		return;
-	}
-
-	if (command === "task") {
-		const action = args[1] ?? "";
-		const output = await task({
-			projectDir: currentWorkingDir,
-			action,
-			name: flag("name"),
-			risk: flag("risk"),
-			dependsOn: flag("depends-on"),
-			description: flag("description"),
-		});
-		console.log(output);
-		return;
-	}
-
-	if (command === "completion") {
-		const format = args[1] ?? "";
-		const output = await completion({ format });
-		console.log(output);
-		return;
-	}
-
-	if (command === "protocol") {
-		const action = args[1] ?? "";
-		const output = await protocol({
-			projectDir: currentWorkingDir,
-			action,
-			name: flag("name"),
-		});
-		console.log(output);
-		return;
-	}
-
-	if (command === "propose") {
-		const output = await propose({
-			projectDir: currentWorkingDir,
-			goal: flag("goal"),
-			goalFile: flag("goal-file"),
-			append: hasFlag("append"),
-			type: flag("type"),
-		});
-		console.log(output);
-		return;
-	}
-
-	if (command === "scaffold") {
-		const target = args[1] ?? "";
-		const output = await scaffold({
-			projectDir: currentWorkingDir,
-			target,
-			force: hasFlag("force"),
-		});
-		console.log(output);
-		return;
-	}
-
-	console.log(USAGE);
+	const output = await commandInstance.execute();
+	console.log(output);
 };
 
 main().catch((error) => {
@@ -181,4 +79,125 @@ function resolveVersion(): string {
 	} catch {
 		return "0.1.0";
 	}
+}
+
+function resolveCommand(value?: string): CliCommand | undefined {
+	if (!value) return undefined;
+	return CLI_COMMAND_ALIASES[value];
+}
+
+function buildCommand(
+	command: CliCommand,
+	argv: string[],
+	projectDir: string,
+): Command | undefined {
+	if (command === CliCommand.INIT) {
+		const projectType = parseProjectType(flag(CliFlag.TYPE));
+		return new InitCommand({
+			projectDir,
+			type: projectType,
+			name: flag(CliFlag.NAME),
+		});
+	}
+
+	if (command === CliCommand.RUN) {
+		return new RunCommand({
+			projectDir,
+			qmdPath: flag(CliFlag.QMD),
+			dryRun: hasFlag(CliFlag.DRY_RUN),
+			noLlm: hasFlag(CliFlag.NO_LLM),
+		});
+	}
+
+	if (command === CliCommand.STATUS) return new StatusCommand({ projectDir });
+
+	if (command === CliCommand.MEMORY) {
+		return new MemoryCommand({
+			projectDir,
+			exportId: flag(CliFlag.EXPORT),
+			patterns: hasFlag(CliFlag.PATTERNS),
+			graduate: hasFlag(CliFlag.GRADUATE),
+		});
+	}
+
+	if (command === CliCommand.TASK) {
+		return new TaskCommand({
+			projectDir,
+			action: parseTaskAction(argv[1]),
+			name: flag(CliFlag.NAME),
+			risk: flag(CliFlag.RISK),
+			dependsOn: flag(CliFlag.DEPENDS_ON),
+			description: flag(CliFlag.DESCRIPTION),
+		});
+	}
+
+	if (command === CliCommand.PROTOCOL) {
+		return new ProtocolCommand({
+			projectDir,
+			action: parseProtocolAction(argv[1]),
+			name: flag(CliFlag.NAME),
+		});
+	}
+
+	if (command === CliCommand.PROPOSE) {
+		return new ProposeCommand({
+			projectDir,
+			goal: flag(CliFlag.GOAL),
+			goalFile: flag(CliFlag.GOAL_FILE),
+			append: hasFlag(CliFlag.APPEND),
+			type: parseProjectType(flag(CliFlag.TYPE)),
+		});
+	}
+
+	if (command === CliCommand.SCAFFOLD) {
+		return new ScaffoldCommand({
+			projectDir,
+			target: parseScaffoldTarget(argv[1]),
+			force: hasFlag(CliFlag.FORCE),
+		});
+	}
+
+	if (command === CliCommand.COMPLETION) {
+		return new CompletionCommand({ format: parseCompletionFormat(argv[1]) });
+	}
+
+	if (command === CliCommand.LINK) {
+		return new LinkCommand({ projectDir, linkPath: flag(CliFlag.PATH) });
+	}
+
+	return undefined;
+}
+
+function parseProjectType(value?: string): ProjectType {
+	if (value === ProjectType.BROWNFIELD) return ProjectType.BROWNFIELD;
+	return ProjectType.GREENFIELD;
+}
+
+function parseTaskAction(value?: string): CliTaskAction | undefined {
+	if (value === CliTaskAction.LIST) return CliTaskAction.LIST;
+	if (value === CliTaskAction.ADD) return CliTaskAction.ADD;
+	if (value === CliTaskAction.REMOVE) return CliTaskAction.REMOVE;
+	return undefined;
+}
+
+function parseProtocolAction(value?: string): CliProtocolAction | undefined {
+	if (value === CliProtocolAction.LIST) return CliProtocolAction.LIST;
+	if (value === CliProtocolAction.ARCHIVE) return CliProtocolAction.ARCHIVE;
+	if (value === CliProtocolAction.RESTORE) return CliProtocolAction.RESTORE;
+	return undefined;
+}
+
+function parseScaffoldTarget(value?: string): CliScaffoldTarget | undefined {
+	if (value === CliScaffoldTarget.CLAUDE) return CliScaffoldTarget.CLAUDE;
+	if (value === CliScaffoldTarget.COPILOT) return CliScaffoldTarget.COPILOT;
+	if (value === CliScaffoldTarget.OPENCODE) return CliScaffoldTarget.OPENCODE;
+	if (value === CliScaffoldTarget.ALL) return CliScaffoldTarget.ALL;
+	return undefined;
+}
+
+function parseCompletionFormat(value?: string): CliCompletionFormat | undefined {
+	if (value === CliCompletionFormat.BASH) return CliCompletionFormat.BASH;
+	if (value === CliCompletionFormat.ZSH) return CliCompletionFormat.ZSH;
+	if (value === CliCompletionFormat.FISH) return CliCompletionFormat.FISH;
+	return undefined;
 }

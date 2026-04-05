@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import type { TaskContext } from "../src/context";
 import { DoubleLoop } from "../src/double-loop";
+import type { TaskContextInterface } from "../src/index";
 
 describe("DoubleLoop", () => {
 	// ===== Happy flows =====
@@ -9,21 +9,21 @@ describe("DoubleLoop", () => {
 		const loop = new DoubleLoop({ goal: "Build auth", constraints: ["no bugs"] });
 
 		loop.addFalsify(
-			async (ctx: TaskContext) => {
+			async (ctx: TaskContextInterface) => {
 				ctx.evidence("result", "holds");
 			},
 			{ name: "check_passwords" },
 		);
 
 		loop.addDeliver(
-			async (ctx: TaskContext) => {
+			async (ctx: TaskContextInterface) => {
 				ctx.evidence("artifact", "auth.ts");
 			},
 			{ name: "build_auth", dependsOn: ["check_passwords"] },
 		);
 
 		loop.addVerify(
-			async (ctx: TaskContext) => {
+			async (ctx: TaskContextInterface) => {
 				ctx.evidence("secure", true);
 			},
 			{ name: "verify_auth", dependsOn: ["build_auth"] },
@@ -39,7 +39,7 @@ describe("DoubleLoop", () => {
 		const loop = new DoubleLoop({ goal: "Test falsification" });
 
 		loop.addFalsify(
-			async (ctx: TaskContext) => {
+			async (ctx: TaskContextInterface) => {
 				ctx.falsify("impossible");
 			},
 			{ name: "impossible_task" },

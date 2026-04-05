@@ -9,7 +9,7 @@
  *
  * Run: bun run examples/brownfield/auth-migration.ts
  */
-import { Protocol, summary, type TaskContext } from "@thecharge/sndv-nano";
+import { Protocol, summary, type TaskContextInterface } from "@thecharge/sndv-nano";
 
 const protocol = new Protocol(
 	{
@@ -26,7 +26,7 @@ const protocol = new Protocol(
 
 // Risk 0.95 — if the session store is too slow, nothing else matters
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const p99LatencyMs = 35.5; // deterministic example value
 
 		ctx.evidence("p99_latency_ms", Math.round(p99LatencyMs * 10) / 10);
@@ -41,7 +41,7 @@ protocol.addTask(
 
 // Risk 0.8 — data integrity during dual-write is treacherous
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const racesDetected = 0; // simulate: no races found
 		const staleReads = 0;
 
@@ -56,7 +56,7 @@ protocol.addTask(
 
 // Risk 0.5 — only matters if latency is OK
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const maxConnections = 100;
 		const usedUnderLoad = 85;
 
@@ -76,7 +76,7 @@ protocol.addTask(
 
 // Risk 0.3 — only if everything else survived
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const rollbackSuccess = true;
 		const usersRecovered = 1000;
 

@@ -78,3 +78,68 @@ export enum DecisionAction {
 	TIMED_OUT = "timed_out",
 	SKIPPED = "skipped",
 }
+
+/** CLI command names. */
+export enum CliCommand {
+	INIT = "init",
+	RUN = "run",
+	STATUS = "status",
+	MEMORY = "memory",
+	TASK = "task",
+	PROTOCOL = "protocol",
+	PROPOSE = "propose",
+	SCAFFOLD = "scaffold",
+	COMPLETION = "completion",
+	LINK = "link",
+	HELP = "help",
+	VERSION = "version",
+}
+
+/** CLI task actions. */
+export enum CliTaskAction {
+	LIST = "list",
+	ADD = "add",
+	REMOVE = "remove",
+}
+
+/** CLI protocol actions. */
+export enum CliProtocolAction {
+	LIST = "list",
+	ARCHIVE = "archive",
+	RESTORE = "restore",
+}
+
+/** CLI scaffold targets. */
+export enum CliScaffoldTarget {
+	CLAUDE = "claude",
+	COPILOT = "copilot",
+	OPENCODE = "opencode",
+	ALL = "all",
+}
+
+/** CLI completion formats. */
+export enum CliCompletionFormat {
+	BASH = "bash",
+	ZSH = "zsh",
+	FISH = "fish",
+}
+
+/** CLI flag names. */
+export enum CliFlag {
+	TYPE = "--type",
+	NAME = "--name",
+	QMD = "--qmd",
+	DRY_RUN = "--dry-run",
+	NO_LLM = "--no-llm",
+	EXPORT = "--export",
+	PATTERNS = "--patterns",
+	GRADUATE = "--graduate",
+	RISK = "--risk",
+	DEPENDS_ON = "--depends-on",
+	DESCRIPTION = "--description",
+	GOAL = "--goal",
+	GOAL_FILE = "--goal-file",
+	APPEND = "--append",
+	FORCE = "--force",
+	PATH = "--path",
+}

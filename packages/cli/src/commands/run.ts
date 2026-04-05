@@ -4,6 +4,7 @@ import { type QmdTask, SNDV_DIR_NAME, type TaskFn, VerdictStatus } from "@thecha
 import { MemoryRepository } from "@thecharge/sndv-memory";
 import { Protocol, summary } from "@thecharge/sndv-nano";
 import { parseQmd } from "@thecharge/sndv-qmd";
+import type { Command } from "./command";
 
 export interface RunOpts {
 	projectDir: string;
@@ -13,60 +14,74 @@ export interface RunOpts {
 }
 
 /** Load protocol from QMD and execute — with LLM by default. */
-export const run = async (opts: RunOpts): Promise<string> => {
-	const qmdPath = opts.qmdPath ?? join(opts.projectDir, SNDV_DIR_NAME, "protocol.qmd");
-	const document = await parseQmd(qmdPath);
+export class RunCommand implements Command {
+	private readonly projectDir: string;
+	private readonly qmdPath?: string;
+	private readonly dryRun?: boolean;
+	private readonly noLlm?: boolean;
 
-	const goal = String(document.frontmatter.goal ?? "Unnamed protocol");
-	const constraints = (document.frontmatter.constraints as string[]) ?? [];
-	const maxIterations = Number(document.frontmatter.max_iterations ?? 20);
-	const hypothesisId = goal.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 64);
-
-	const memoryRepository = new MemoryRepository({ root: join(opts.projectDir, SNDV_DIR_NAME) });
-	await memoryRepository.init();
-	const memoryContext = await memoryRepository.exportForLlm(hypothesisId);
-
-	const systemPrompt = buildSystemPrompt({
-		goal,
-		constraints,
-		tasks: document.tasks.map((task) => ({
-			name: task.name,
-			risk: task.risk,
-			dependsOn: task.dependsOn,
-		})),
-	});
-
-	const protocol = new Protocol({ goal, constraints }, { maxIterations });
-	const llmClient = opts.noLlm ? null : new LlmClient();
-
-	for (const task of document.tasks) {
-		const taskFunction = llmClient
-			? createLlmTask(task, llmClient, systemPrompt, memoryContext)
-			: createOfflineTask(task);
-
-		protocol.addTask(taskFunction, {
-			name: task.name,
-			risk: task.risk,
-			dependsOn: task.dependsOn,
-		});
+	constructor(opts: RunOpts) {
+		this.projectDir = opts.projectDir;
+		this.qmdPath = opts.qmdPath;
+		this.dryRun = opts.dryRun;
+		this.noLlm = opts.noLlm;
 	}
 
-	if (opts.dryRun) return protocol.visualize();
+	execute = async (): Promise<string> => {
+		const qmdPath = this.qmdPath ?? join(this.projectDir, SNDV_DIR_NAME, "protocol.qmd");
+		const document = await parseQmd(qmdPath);
 
-	const report = await protocol.execute();
+		const goal = String(document.frontmatter.goal ?? "Unnamed protocol");
+		const constraints = (document.frontmatter.constraints as string[]) ?? [];
+		const maxIterations = Number(document.frontmatter.max_iterations ?? 20);
+		const hypothesisId = goal.replace(/[^a-zA-Z0-9_-]/g, "_").slice(0, 64);
 
-	await memoryRepository.sessions.recordRun(hypothesisId, {
-		goal,
-		status: report.status,
-		durationMs: report.totalDurationMs,
-		iterations: report.iterations,
-		survivingPath: report.survivingPath,
-		prunedPaths: report.prunedPaths,
-		taskResults: report.taskResults,
-	});
+		const memoryRepository = new MemoryRepository({ root: join(this.projectDir, SNDV_DIR_NAME) });
+		await memoryRepository.init();
+		const memoryContext = await memoryRepository.exportForLlm(hypothesisId);
 
-	return summary(report);
-};
+		const systemPrompt = buildSystemPrompt({
+			goal,
+			constraints,
+			tasks: document.tasks.map((task) => ({
+				name: task.name,
+				risk: task.risk,
+				dependsOn: task.dependsOn,
+			})),
+		});
+
+		const protocol = new Protocol({ goal, constraints }, { maxIterations });
+		const llmClient = this.noLlm ? null : new LlmClient();
+
+		for (const task of document.tasks) {
+			const taskFunction = llmClient
+				? createLlmTask(task, llmClient, systemPrompt, memoryContext)
+				: createOfflineTask(task);
+
+			protocol.addTask(taskFunction, {
+				name: task.name,
+				risk: task.risk,
+				dependsOn: task.dependsOn,
+			});
+		}
+
+		if (this.dryRun) return protocol.visualize();
+
+		const report = await protocol.execute();
+
+		await memoryRepository.sessions.recordRun(hypothesisId, {
+			goal,
+			status: report.status,
+			durationMs: report.totalDurationMs,
+			iterations: report.iterations,
+			survivingPath: report.survivingPath,
+			prunedPaths: report.prunedPaths,
+			taskResults: report.taskResults,
+		});
+
+		return summary(report);
+	};
+}
 
 const createLlmTask = (
 	task: QmdTask,

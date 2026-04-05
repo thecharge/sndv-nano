@@ -1,3 +1,11 @@
+import {
+	CliCommand,
+	CliCompletionFormat,
+	CliProtocolAction,
+	CliScaffoldTarget,
+	CliTaskAction,
+} from "./enums";
+
 /** Default maximum iterations for a protocol run. */
 export const DEFAULT_MAX_ITERATIONS = 20;
 
@@ -108,3 +116,76 @@ export const DEFAULT_PROTOCOL_FILENAME = "protocol.qmd";
 
 /** Config filename within SNDV dir. */
 export const CONFIG_FILENAME = "config.json";
+
+/** Default local bin directory for user-level symlink. */
+export const CLI_LOCAL_BIN_DIR = "~/.local/bin";
+
+/** Default user-level symlink path for sndv CLI. */
+export const CLI_DEFAULT_SYMLINK_PATH = "~/.local/bin/sndv";
+
+/** CLI build output relative to repo root. */
+export const CLI_DIST_RELATIVE_PATH = "packages/cli/dist/index.js";
+
+/** CLI command list in help and completion. */
+export const CLI_COMMANDS: readonly CliCommand[] = [
+	CliCommand.INIT,
+	CliCommand.RUN,
+	CliCommand.STATUS,
+	CliCommand.MEMORY,
+	CliCommand.TASK,
+	CliCommand.PROTOCOL,
+	CliCommand.PROPOSE,
+	CliCommand.SCAFFOLD,
+	CliCommand.COMPLETION,
+	CliCommand.LINK,
+	CliCommand.HELP,
+	CliCommand.VERSION,
+] as const;
+
+/** CLI command aliases mapped to canonical command enum. */
+export const CLI_COMMAND_ALIASES: Readonly<Record<string, CliCommand>> = {
+	init: CliCommand.INIT,
+	run: CliCommand.RUN,
+	status: CliCommand.STATUS,
+	memory: CliCommand.MEMORY,
+	task: CliCommand.TASK,
+	protocol: CliCommand.PROTOCOL,
+	propose: CliCommand.PROPOSE,
+	scaffold: CliCommand.SCAFFOLD,
+	completion: CliCommand.COMPLETION,
+	link: CliCommand.LINK,
+	help: CliCommand.HELP,
+	"--help": CliCommand.HELP,
+	"-h": CliCommand.HELP,
+	"--version": CliCommand.VERSION,
+	"-v": CliCommand.VERSION,
+} as const;
+
+/** CLI task actions for subcommands. */
+export const CLI_TASK_ACTIONS: readonly CliTaskAction[] = [
+	CliTaskAction.LIST,
+	CliTaskAction.ADD,
+	CliTaskAction.REMOVE,
+] as const;
+
+/** CLI protocol actions for subcommands. */
+export const CLI_PROTOCOL_ACTIONS: readonly CliProtocolAction[] = [
+	CliProtocolAction.LIST,
+	CliProtocolAction.ARCHIVE,
+	CliProtocolAction.RESTORE,
+] as const;
+
+/** CLI scaffold targets. */
+export const CLI_SCAFFOLD_TARGETS: readonly CliScaffoldTarget[] = [
+	CliScaffoldTarget.CLAUDE,
+	CliScaffoldTarget.COPILOT,
+	CliScaffoldTarget.OPENCODE,
+	CliScaffoldTarget.ALL,
+] as const;
+
+/** CLI completion formats. */
+export const CLI_COMPLETION_FORMATS: readonly CliCompletionFormat[] = [
+	CliCompletionFormat.BASH,
+	CliCompletionFormat.ZSH,
+	CliCompletionFormat.FISH,
+] as const;

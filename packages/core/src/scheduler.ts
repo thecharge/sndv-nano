@@ -8,15 +8,25 @@ import {
 /** Validate the dependency graph: no missing deps, no cycles (Kahn's algorithm). */
 export const validateGraph = (tasks: Map<string, SchedulableTask>): void => {
 	const names = new Set(tasks.keys());
+	ensureDependenciesExist(tasks, names);
+	const { inDegree, adjacencyList } = buildGraph(tasks, names);
+	const hasCycle = detectCycle(names, inDegree, adjacencyList);
+	if (hasCycle) throw SmepErrors.cycleDetected();
+};
 
+const ensureDependenciesExist = (tasks: Map<string, SchedulableTask>, names: Set<string>): void => {
 	for (const task of tasks.values()) {
 		for (const depName of task.dependsOn) {
-			if (!names.has(depName)) {
-				throw SmepErrors.missingDependency(task.id, depName);
-			}
+			if (names.has(depName)) continue;
+			throw SmepErrors.missingDependency(task.id, depName);
 		}
 	}
+};
 
+const buildGraph = (
+	tasks: Map<string, SchedulableTask>,
+	names: Set<string>,
+): { inDegree: Map<string, number>; adjacencyList: Map<string, string[]> } => {
 	const inDegree = new Map<string, number>();
 	const adjacencyList = new Map<string, string[]>();
 
@@ -32,6 +42,14 @@ export const validateGraph = (tasks: Map<string, SchedulableTask>): void => {
 		}
 	}
 
+	return { inDegree, adjacencyList };
+};
+
+const detectCycle = (
+	names: Set<string>,
+	inDegree: Map<string, number>,
+	adjacencyList: Map<string, string[]>,
+): boolean => {
 	const zeroInDegreeQueue = [...names].filter((taskName) => inDegree.get(taskName) === 0);
 	let visitedCount = 0;
 
@@ -46,7 +64,7 @@ export const validateGraph = (tasks: Map<string, SchedulableTask>): void => {
 		}
 	}
 
-	if (visitedCount !== names.size) throw SmepErrors.cycleDetected();
+	return visitedCount !== names.size;
 };
 
 /** Return IDs of tasks that are pending with all deps verified — sorted by risk descending. */

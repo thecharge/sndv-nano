@@ -2,10 +2,21 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { completion } from "../src/commands/completion";
-import { protocol } from "../src/commands/protocol";
-import { scaffold } from "../src/commands/scaffold";
-import { task } from "../src/commands/task";
+import {
+	buildCompletionUsage,
+	buildProtocolUsage,
+	buildScaffoldUsage,
+	buildTaskUsage,
+	CliCompletionFormat,
+	CliErrors,
+	CliProtocolAction,
+	CliScaffoldTarget,
+	CliTaskAction,
+} from "@thecharge/sndv-config";
+import { CompletionCommand } from "../src/commands/completion";
+import { ProtocolCommand } from "../src/commands/protocol";
+import { ScaffoldCommand } from "../src/commands/scaffold";
+import { TaskCommand } from "../src/commands/task";
 
 let tempDir: string;
 
@@ -43,209 +54,301 @@ afterEach(async () => {
 // --- scaffold ---
 
 describe("scaffold", () => {
-	test("scaffolds CLAUDE.md for claude target", async () => {
-		const output = await scaffold({ projectDir: tempDir, target: "claude" });
-		expect(output).toContain("created:");
-		const content = await readFile(join(tempDir, "CLAUDE.md"), "utf-8");
-		expect(content).toContain("SNDV Protocol");
-		expect(content).toContain("sndv status");
+	const scaffoldCases = [
+		{
+			name: "scaffolds CLAUDE.md for claude target",
+			target: CliScaffoldTarget.CLAUDE,
+			relativePath: "CLAUDE.md",
+			expects: ["SNDV Protocol", "sndv status"],
+		},
+		{
+			name: "scaffolds copilot instructions",
+			target: CliScaffoldTarget.COPILOT,
+			relativePath: join(".github", "copilot-instructions.md"),
+			expects: ["SNDV Protocol"],
+		},
+		{
+			name: "scaffolds AGENTS.md for opencode",
+			target: CliScaffoldTarget.OPENCODE,
+			relativePath: "AGENTS.md",
+			expects: ["SNDV Protocol"],
+		},
+	];
+
+	for (const testCase of scaffoldCases) {
+		test(testCase.name, async () => {
+			const output = await new ScaffoldCommand({
+				projectDir: tempDir,
+				target: testCase.target,
+			}).execute();
+			expect(output).toContain("created:");
+			const content = await readFile(join(tempDir, testCase.relativePath), "utf-8");
+			for (const expected of testCase.expects) {
+				expect(content).toContain(expected);
+			}
+		});
+	}
+
+	const allCase = {
+		name: "scaffolds all targets",
+		target: CliScaffoldTarget.ALL,
+		expects: ["CLAUDE.md", "copilot-instructions.md", "AGENTS.md"],
+	};
+
+	test(allCase.name, async () => {
+		const output = await new ScaffoldCommand({
+			projectDir: tempDir,
+			target: allCase.target,
+		}).execute();
+		for (const expected of allCase.expects) {
+			expect(output).toContain(expected);
+		}
 	});
 
-	test("scaffolds copilot instructions", async () => {
-		const output = await scaffold({ projectDir: tempDir, target: "copilot" });
-		expect(output).toContain("created:");
-		const content = await readFile(join(tempDir, ".github", "copilot-instructions.md"), "utf-8");
-		expect(content).toContain("SNDV Protocol");
-	});
+	const overwriteCases = [
+		{
+			name: "skips existing files",
+			force: false,
+			expectedOutput: "exists:",
+			expectedContent: "existing content",
+		},
+		{
+			name: "overwrites existing files with force",
+			force: true,
+			expectedOutput: "overwritten:",
+			expectedContent: "SNDV Protocol",
+		},
+	];
 
-	test("scaffolds AGENTS.md for opencode", async () => {
-		const output = await scaffold({ projectDir: tempDir, target: "opencode" });
-		expect(output).toContain("created:");
-		const content = await readFile(join(tempDir, "AGENTS.md"), "utf-8");
-		expect(content).toContain("SNDV Protocol");
-	});
-
-	test("scaffolds all targets", async () => {
-		const output = await scaffold({ projectDir: tempDir, target: "all" });
-		expect(output).toContain("CLAUDE.md");
-		expect(output).toContain("copilot-instructions.md");
-		expect(output).toContain("AGENTS.md");
-	});
-
-	test("skips existing files", async () => {
-		await writeFile(join(tempDir, "CLAUDE.md"), "existing content");
-		const output = await scaffold({ projectDir: tempDir, target: "claude" });
-		expect(output).toContain("exists:");
-		const content = await readFile(join(tempDir, "CLAUDE.md"), "utf-8");
-		expect(content).toBe("existing content");
-	});
-
-	test("overwrites existing files with force", async () => {
-		await writeFile(join(tempDir, "CLAUDE.md"), "existing content");
-		const output = await scaffold({ projectDir: tempDir, target: "claude", force: true });
-		expect(output).toContain("overwritten:");
-		const content = await readFile(join(tempDir, "CLAUDE.md"), "utf-8");
-		expect(content).toContain("SNDV Protocol");
-	});
+	for (const testCase of overwriteCases) {
+		test(testCase.name, async () => {
+			await writeFile(join(tempDir, "CLAUDE.md"), "existing content");
+			const output = await new ScaffoldCommand({
+				projectDir: tempDir,
+				target: CliScaffoldTarget.CLAUDE,
+				force: testCase.force,
+			}).execute();
+			expect(output).toContain(testCase.expectedOutput);
+			const content = await readFile(join(tempDir, "CLAUDE.md"), "utf-8");
+			expect(content).toContain(testCase.expectedContent);
+		});
+	}
 
 	test("returns usage for invalid target", async () => {
-		const output = await scaffold({ projectDir: tempDir, target: "invalid" });
-		expect(output).toContain("Targets:");
+		const output = await new ScaffoldCommand({
+			projectDir: tempDir,
+			target: "invalid" as CliScaffoldTarget,
+		}).execute();
+		expect(output).toBe(buildScaffoldUsage());
 	});
 });
 
 // --- task ---
 
 describe("task", () => {
-	test("lists tasks", async () => {
-		const output = await task({ projectDir: tempDir, action: "list" });
-		expect(output).toContain("existing_task");
-		expect(output).toContain("risk=0.9");
-	});
+	const taskCases = [
+		{
+			name: "lists tasks",
+			opts: { action: CliTaskAction.LIST },
+			assert: (output: string) => {
+				expect(output).toContain("existing_task");
+				expect(output).toContain("risk=0.9");
+			},
+		},
+		{
+			name: "adds a task",
+			opts: {
+				action: CliTaskAction.ADD,
+				name: "new_task",
+				risk: "0.7",
+				dependsOn: "existing_task",
+				description: "Break something new",
+			},
+			assert: async (output: string) => {
+				expect(output).toContain('Added task "new_task"');
+				const raw = await readFile(join(tempDir, ".sndv", "protocol.qmd"), "utf-8");
+				expect(raw).toContain("# Task: new_task");
+				expect(raw).toContain("risk: 0.7");
+				expect(raw).toContain("depends_on: [existing_task]");
+			},
+		},
+		{
+			name: "rejects duplicate task name",
+			opts: { action: CliTaskAction.ADD, name: "existing_task" },
+			assert: (output: string) => {
+				expect(output).toBe(CliErrors.duplicateTask("existing_task").message);
+			},
+		},
+		{
+			name: "rejects invalid risk",
+			opts: { action: CliTaskAction.ADD, name: "bad_risk", risk: "1.5" },
+			assert: (output: string) => {
+				expect(output).toBe(CliErrors.invalidRisk().message);
+			},
+		},
+		{
+			name: "removes a task",
+			opts: { action: CliTaskAction.REMOVE, name: "existing_task" },
+			assert: async (output: string) => {
+				expect(output).toContain('Removed task "existing_task"');
+				const raw = await readFile(join(tempDir, ".sndv", "protocol.qmd"), "utf-8");
+				expect(raw).not.toContain("# Task: existing_task");
+			},
+		},
+		{
+			name: "rejects removing nonexistent task",
+			opts: { action: CliTaskAction.REMOVE, name: "nope" },
+			assert: (output: string) => {
+				expect(output).toBe(CliErrors.unknownTask("nope").message);
+			},
+		},
+		{
+			name: "returns usage for unknown action",
+			opts: { action: "wat" as CliTaskAction },
+			assert: (output: string) => {
+				expect(output).toBe(buildTaskUsage());
+			},
+		},
+	];
 
-	test("adds a task", async () => {
-		const output = await task({
-			projectDir: tempDir,
-			action: "add",
-			name: "new_task",
-			risk: "0.7",
-			dependsOn: "existing_task",
-			description: "Break something new",
+	for (const testCase of taskCases) {
+		test(testCase.name, async () => {
+			const output = await new TaskCommand({
+				projectDir: tempDir,
+				...testCase.opts,
+			}).execute();
+			await testCase.assert(output);
 		});
-		expect(output).toContain('Added task "new_task"');
-
-		const raw = await readFile(join(tempDir, ".sndv", "protocol.qmd"), "utf-8");
-		expect(raw).toContain("# Task: new_task");
-		expect(raw).toContain("risk: 0.7");
-		expect(raw).toContain("depends_on: [existing_task]");
-	});
-
-	test("rejects duplicate task name", async () => {
-		const output = await task({
-			projectDir: tempDir,
-			action: "add",
-			name: "existing_task",
-		});
-		expect(output).toContain("already exists");
-	});
-
-	test("rejects invalid risk", async () => {
-		const output = await task({
-			projectDir: tempDir,
-			action: "add",
-			name: "bad_risk",
-			risk: "1.5",
-		});
-		expect(output).toContain("risk must be between");
-	});
-
-	test("removes a task", async () => {
-		const output = await task({
-			projectDir: tempDir,
-			action: "remove",
-			name: "existing_task",
-		});
-		expect(output).toContain('Removed task "existing_task"');
-
-		const raw = await readFile(join(tempDir, ".sndv", "protocol.qmd"), "utf-8");
-		expect(raw).not.toContain("# Task: existing_task");
-	});
-
-	test("rejects removing nonexistent task", async () => {
-		const output = await task({
-			projectDir: tempDir,
-			action: "remove",
-			name: "nope",
-		});
-		expect(output).toContain("not found");
-	});
-
-	test("returns usage for unknown action", async () => {
-		const output = await task({ projectDir: tempDir, action: "wat" });
-		expect(output).toContain("Actions:");
-	});
+	}
 });
 
 // --- protocol ---
 
 describe("protocol", () => {
-	test("lists current protocol", async () => {
-		const output = await protocol({ projectDir: tempDir, action: "list" });
-		expect(output).toContain("Current: Test goal");
-		expect(output).toContain("1 tasks");
-	});
+	const protocolCases = [
+		{
+			name: "lists current protocol",
+			opts: { action: CliProtocolAction.LIST },
+			assert: (output: string) => {
+				expect(output).toContain("Current: Test goal");
+				expect(output).toContain("1 tasks");
+			},
+		},
+		{
+			name: "archives current protocol",
+			opts: { action: CliProtocolAction.ARCHIVE, name: "v1" },
+			assert: async (output: string) => {
+				expect(output).toContain('Archived current protocol as "v1"');
+				const archived = await readFile(join(tempDir, ".sndv", "archive", "v1.qmd"), "utf-8");
+				expect(archived).toContain("Test goal");
+			},
+		},
+		{
+			name: "restores archived protocol",
+			opts: { action: CliProtocolAction.RESTORE, name: "v1" },
+			prepare: async () => {
+				await new ProtocolCommand({
+					projectDir: tempDir,
+					action: CliProtocolAction.ARCHIVE,
+					name: "v1",
+				}).execute();
+				await writeFile(join(tempDir, ".sndv", "protocol.qmd"), `---\ngoal: "New goal"\n---\n`);
+			},
+			assert: async (output: string) => {
+				expect(output).toContain('Restored protocol "v1" as current');
+				const current = await readFile(join(tempDir, ".sndv", "protocol.qmd"), "utf-8");
+				expect(current).toContain("Test goal");
+			},
+		},
+		{
+			name: "lists archived protocols",
+			opts: { action: CliProtocolAction.LIST },
+			prepare: async () => {
+				await new ProtocolCommand({
+					projectDir: tempDir,
+					action: CliProtocolAction.ARCHIVE,
+					name: "v1",
+				}).execute();
+				await writeFile(join(tempDir, ".sndv", "protocol.qmd"), `---\ngoal: "New"\n---\n`);
+			},
+			assert: (output: string) => {
+				expect(output).toContain("v1:");
+				expect(output).toContain("Test goal");
+			},
+		},
+		{
+			name: "rejects restoring nonexistent archive",
+			opts: { action: CliProtocolAction.RESTORE, name: "nope" },
+			assert: (output: string) => {
+				expect(output).toBe(CliErrors.archiveMissing("nope").message);
+			},
+		},
+		{
+			name: "returns usage for unknown action",
+			opts: { action: "wat" as CliProtocolAction },
+			assert: (output: string) => {
+				expect(output).toBe(buildProtocolUsage());
+			},
+		},
+	];
 
-	test("archives current protocol", async () => {
-		const output = await protocol({
-			projectDir: tempDir,
-			action: "archive",
-			name: "v1",
+	for (const testCase of protocolCases) {
+		test(testCase.name, async () => {
+			if (testCase.prepare) await testCase.prepare();
+			const output = await new ProtocolCommand({
+				projectDir: tempDir,
+				...testCase.opts,
+			}).execute();
+			await testCase.assert(output);
 		});
-		expect(output).toContain('Archived current protocol as "v1"');
-
-		const archived = await readFile(join(tempDir, ".sndv", "archive", "v1.qmd"), "utf-8");
-		expect(archived).toContain("Test goal");
-	});
-
-	test("restores archived protocol", async () => {
-		await protocol({ projectDir: tempDir, action: "archive", name: "v1" });
-		await writeFile(join(tempDir, ".sndv", "protocol.qmd"), `---\ngoal: "New goal"\n---\n`);
-
-		const output = await protocol({
-			projectDir: tempDir,
-			action: "restore",
-			name: "v1",
-		});
-		expect(output).toContain('Restored protocol "v1"');
-
-		const current = await readFile(join(tempDir, ".sndv", "protocol.qmd"), "utf-8");
-		expect(current).toContain("Test goal");
-	});
-
-	test("lists archived protocols", async () => {
-		await protocol({ projectDir: tempDir, action: "archive", name: "v1" });
-		await writeFile(join(tempDir, ".sndv", "protocol.qmd"), `---\ngoal: "New"\n---\n`);
-
-		const output = await protocol({ projectDir: tempDir, action: "list" });
-		expect(output).toContain("v1:");
-		expect(output).toContain("Test goal");
-	});
-
-	test("rejects restoring nonexistent archive", async () => {
-		const output = await protocol({
-			projectDir: tempDir,
-			action: "restore",
-			name: "nope",
-		});
-		expect(output).toContain("not found");
-	});
-
-	test("returns usage for unknown action", async () => {
-		const output = await protocol({ projectDir: tempDir, action: "wat" });
-		expect(output).toContain("Actions:");
-	});
+	}
 });
 
 // --- completion ---
 
 describe("completion", () => {
-	test("renders bash completion", async () => {
-		const output = await completion({ format: "bash" });
-		expect(output).toContain("_sndv_complete");
-	});
+	const completionCases = [
+		{
+			name: "renders bash completion",
+			format: CliCompletionFormat.BASH,
+			expects: "_sndv_complete",
+		},
+		{
+			name: "renders zsh completion",
+			format: CliCompletionFormat.ZSH,
+			expects: "#compdef sndv",
+		},
+		{
+			name: "renders fish completion",
+			format: CliCompletionFormat.FISH,
+			expects: "complete -c sndv",
+		},
+	];
 
-	test("renders zsh completion", async () => {
-		const output = await completion({ format: "zsh" });
-		expect(output).toContain("#compdef sndv");
-	});
+	for (const testCase of completionCases) {
+		test(testCase.name, async () => {
+			const output = await new CompletionCommand({ format: testCase.format }).execute();
+			expect(output).toContain(testCase.expects);
+		});
+	}
 
-	test("renders fish completion", async () => {
-		const output = await completion({ format: "fish" });
-		expect(output).toContain("complete -c sndv");
-	});
+	const invalidCases = [
+		{
+			name: "returns usage for missing format",
+			format: undefined,
+			expects: buildCompletionUsage(),
+		},
+		{
+			name: "returns error for unknown format",
+			format: "wat" as CliCompletionFormat,
+			expects: CliErrors.invalidCompletionFormat("wat").message,
+		},
+	];
 
-	test("returns usage for unknown format", async () => {
-		const output = await completion({ format: "wat" });
-		expect(output).toContain("completion <bash|zsh|fish>");
-	});
+	for (const testCase of invalidCases) {
+		test(testCase.name, async () => {
+			const output = await new CompletionCommand({ format: testCase.format }).execute();
+			expect(output).toBe(testCase.expects);
+		});
+	}
 });

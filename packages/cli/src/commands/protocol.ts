@@ -1,31 +1,47 @@
 import { copyFile, mkdir, readdir, readFile, rename } from "node:fs/promises";
 import { join } from "node:path";
-import { SNDV_DIR_NAME } from "@thecharge/sndv-config";
+import {
+	buildProtocolUsage,
+	CliErrors,
+	CliProtocolAction,
+	SNDV_DIR_NAME,
+} from "@thecharge/sndv-config";
 import { parseQmd } from "@thecharge/sndv-qmd";
+import type { Command } from "./command";
 
 export interface ProtocolOpts {
 	projectDir: string;
-	action: string;
+	action?: CliProtocolAction;
 	name?: string;
 }
-
-export const PROTOCOL_USAGE = `sndv protocol <action> [options]
-
-Actions:
-  list                   List current and archived protocols
-  archive [--name <n>]   Archive the current protocol (optional name)
-  restore --name <n>     Restore an archived protocol as current`;
 
 const archiveDir = (projectDir: string): string => join(projectDir, SNDV_DIR_NAME, "archive");
 
 const currentQmd = (projectDir: string): string => join(projectDir, SNDV_DIR_NAME, "protocol.qmd");
 
-export const protocol = async (opts: ProtocolOpts): Promise<string> => {
-	if (opts.action === "list") return listProtocols(opts.projectDir);
-	if (opts.action === "archive") return archiveProtocol(opts);
-	if (opts.action === "restore") return restoreProtocol(opts);
-	return PROTOCOL_USAGE;
-};
+export class ProtocolCommand implements Command {
+	private readonly projectDir: string;
+	private readonly action?: CliProtocolAction;
+	private readonly name?: string;
+
+	constructor(opts: ProtocolOpts) {
+		this.projectDir = opts.projectDir;
+		this.action = opts.action;
+		this.name = opts.name;
+	}
+
+	execute = async (): Promise<string> => {
+		if (!this.action) return buildProtocolUsage();
+		if (this.action === CliProtocolAction.LIST) return listProtocols(this.projectDir);
+		if (this.action === CliProtocolAction.ARCHIVE) {
+			return archiveProtocol({ projectDir: this.projectDir, name: this.name });
+		}
+		if (this.action === CliProtocolAction.RESTORE) {
+			return restoreProtocol({ projectDir: this.projectDir, name: this.name });
+		}
+		return buildProtocolUsage();
+	};
+}
 
 const listProtocols = async (projectDir: string): Promise<string> => {
 	const lines: string[] = [];
@@ -65,21 +81,19 @@ const archiveProtocol = async (opts: ProtocolOpts): Promise<string> => {
 	try {
 		await readFile(src, "utf-8");
 	} catch {
-		return "Error: no current protocol.qmd to archive";
+		return CliErrors.missingProtocol().message;
 	}
 
 	const dir = archiveDir(opts.projectDir);
 	await mkdir(dir, { recursive: true });
 
 	const archiveName = opts.name ?? `protocol-${Date.now()}`;
-	if (!isValidArchiveName(archiveName)) {
-		return "Error: archive name must be alphanumeric with dashes/underscores";
-	}
+	if (!isValidArchiveName(archiveName)) return CliErrors.invalidArchiveName().message;
 	const dest = join(dir, `${archiveName}.qmd`);
 
 	try {
 		await readFile(dest, "utf-8");
-		return `Error: archive "${archiveName}" already exists`;
+		return CliErrors.archiveExists(archiveName).message;
 	} catch {
 		/* does not exist, good */
 	}
@@ -89,17 +103,15 @@ const archiveProtocol = async (opts: ProtocolOpts): Promise<string> => {
 };
 
 const restoreProtocol = async (opts: ProtocolOpts): Promise<string> => {
-	if (!opts.name) return "Error: --name is required for protocol restore";
-	if (!isValidArchiveName(opts.name)) {
-		return "Error: archive name must be alphanumeric with dashes/underscores";
-	}
+	if (!opts.name) return CliErrors.invalidArchiveName().message;
+	if (!isValidArchiveName(opts.name)) return CliErrors.invalidArchiveName().message;
 
 	const src = join(archiveDir(opts.projectDir), `${opts.name}.qmd`);
 
 	try {
 		await readFile(src, "utf-8");
 	} catch {
-		return `Error: archived protocol "${opts.name}" not found`;
+		return CliErrors.archiveMissing(opts.name).message;
 	}
 
 	const dest = currentQmd(opts.projectDir);

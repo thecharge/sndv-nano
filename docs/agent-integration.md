@@ -6,13 +6,14 @@ This guide covers the full lifecycle: install SNDV globally, use it with any pro
 
 ## Install SNDV globally
 
-Clone the repo and link the CLI so it is available in any workspace:
+Clone the repo, build the CLI, and link it so it is available in any workspace:
 
 ```bash
 git clone https://github.com/thecharge/sndv-nano.git
 cd sndv-nano
 bun install
-bun link
+bun run build
+bun run packages/cli/src/index.ts link
 ```
 
 After linking, the `sndv` command is available in your shell. Navigate to any project and use it:
@@ -54,9 +55,10 @@ This creates:
 
 ```
 .sndv/
-  config.json       # project metadata
-  protocol.qmd      # protocol definition (edit this)
-  long-term/         # persistent memory dir
+  config.json        # project metadata
+  protocol.qmd       # protocol definition (edit this)
+  sessions/          # per-hypothesis run history
+  memory/            # long-term patterns and constraints
 ```
 
 The generated `protocol.qmd` is a template. You must edit it to define your actual goal, constraints, and tasks.

@@ -20,6 +20,15 @@ export const extractPatterns = async (
 	const minOccurrences = opts.minOccurrences ?? DEFAULT_MIN_PATTERN_OCCURRENCES;
 	const minConfidence = opts.minConfidence ?? DEFAULT_MIN_PATTERN_CONFIDENCE;
 
+	const failureGroups = await collectFailureGroups(sessions);
+	return buildPatterns(failureGroups, minOccurrences, minConfidence);
+};
+
+const collectFailureGroups = async (
+	sessions: SessionMemory,
+): Promise<
+	Map<string, Array<{ hypothesis: string; task: string; reason: string; timestamp: string }>>
+> => {
 	const hypotheses = await sessions.listHypotheses();
 	const failureGroups = new Map<
 		string,
@@ -42,33 +51,60 @@ export const extractPatterns = async (
 		}
 	}
 
+	return failureGroups;
+};
+
+const buildPatterns = async (
+	failureGroups: Map<
+		string,
+		Array<{ hypothesis: string; task: string; reason: string; timestamp: string }>
+	>,
+	minOccurrences: number,
+	minConfidence: number,
+): Promise<Pattern[]> => {
 	const patterns: Pattern[] = [];
-
 	for (const [, occurrences] of failureGroups) {
-		if (occurrences.length < minOccurrences) continue;
-
-		const confidence = Math.min(1.0, occurrences.length / (minOccurrences * 3));
-		if (confidence < minConfidence) continue;
-
-		const sourceHypotheses = [...new Set(occurrences.map((occurrence) => occurrence.hypothesis))];
-		const timestamps = occurrences.map((occurrence) => occurrence.timestamp).filter(Boolean);
-		const representativeReason = occurrences[0].reason;
-
-		const patternId = `auto-${await hashString(normalizeReason(representativeReason))}`;
-
-		patterns.push({
-			id: patternId,
-			pattern: representativeReason,
-			confidence,
-			occurrences: occurrences.length,
-			firstSeen: timestamps.length > 0 ? timestamps.sort()[0] : new Date().toISOString(),
-			lastSeen: timestamps.length > 0 ? timestamps.sort().at(-1)! : new Date().toISOString(),
-			sourceHypotheses,
-			tags: extractTags(representativeReason),
-		});
+		const pattern = await buildPattern(occurrences, minOccurrences, minConfidence);
+		if (!pattern) continue;
+		patterns.push(pattern);
 	}
-
 	return patterns;
+};
+
+const buildPattern = async (
+	occurrences: Array<{ hypothesis: string; task: string; reason: string; timestamp: string }>,
+	minOccurrences: number,
+	minConfidence: number,
+): Promise<Pattern | null> => {
+	if (occurrences.length < minOccurrences) return null;
+	const confidence = Math.min(1.0, occurrences.length / (minOccurrences * 3));
+	if (confidence < minConfidence) return null;
+
+	const sourceHypotheses = [...new Set(occurrences.map((occurrence) => occurrence.hypothesis))];
+	const timestamps = occurrences.map((occurrence) => occurrence.timestamp).filter(Boolean);
+	const representativeReason = occurrences[0].reason;
+	const patternId = `auto-${await hashString(normalizeReason(representativeReason))}`;
+	const { firstSeen, lastSeen } = resolveBounds(timestamps);
+
+	return {
+		id: patternId,
+		pattern: representativeReason,
+		confidence,
+		occurrences: occurrences.length,
+		firstSeen,
+		lastSeen,
+		sourceHypotheses,
+		tags: extractTags(representativeReason),
+	};
+};
+
+const resolveBounds = (timestamps: string[]): { firstSeen: string; lastSeen: string } => {
+	if (timestamps.length === 0) {
+		const now = new Date().toISOString();
+		return { firstSeen: now, lastSeen: now };
+	}
+	const sorted = [...timestamps].sort();
+	return { firstSeen: sorted[0], lastSeen: sorted[sorted.length - 1] };
 };
 
 const normalizeReason = (reason: string): string =>

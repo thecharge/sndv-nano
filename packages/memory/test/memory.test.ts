@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, test } from "bun:test";
 import { mkdtemp } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import type { SessionContext } from "@thecharge/sndv-config";
+import { DecisionAction, type SessionContext } from "@thecharge/sndv-config";
 import { LongTermMemory } from "../src/long-term";
 import { buildPromptFragment } from "../src/prompt";
 import { MemoryRepository } from "../src/repository";
@@ -258,7 +258,7 @@ describe("buildPromptFragment", () => {
 			pastDecisions: [
 				{
 					task: "check_api",
-					action: "falsified",
+					action: DecisionAction.FALSIFIED,
 					reason: "API broke",
 					evidence: {},
 					timestamp: "2024-01-01",
@@ -266,7 +266,7 @@ describe("buildPromptFragment", () => {
 				},
 				{
 					task: "check_db",
-					action: "verified",
+					action: DecisionAction.VERIFIED,
 					reason: "ok",
 					evidence: {},
 					timestamp: "2024-01-01",

@@ -7,7 +7,7 @@
  *
  * Run: bun run examples/prd-review/run.ts
  */
-import { DoubleLoop, type TaskContext } from "@thecharge/sndv-nano";
+import { DoubleLoop, type TaskContextInterface } from "@thecharge/sndv-nano";
 
 const loop = new DoubleLoop(
 	{
@@ -20,7 +20,7 @@ const loop = new DoubleLoop(
 // --- FALSIFY: attack the plan ---
 
 loop.addFalsify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const maxEditors = 100;
 		const crdtMemoryPerUserMb = 2.5;
 		const totalMemoryMb = maxEditors * crdtMemoryPerUserMb;
@@ -36,7 +36,7 @@ loop.addFalsify(
 );
 
 loop.addFalsify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const serializationMs = 15;
 		const networkMs = 50;
 		const conflictResolutionMs = 30;
@@ -61,7 +61,7 @@ loop.addFalsify(
 // --- DELIVER: build what survived ---
 
 loop.addDeliver(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		ctx.evidence("artifact", "crdt-engine-v1");
 		ctx.evidence("implementation", "Yjs-based CRDT with WebSocket transport");
 	},
@@ -71,7 +71,7 @@ loop.addDeliver(
 // --- VERIFY: attack what was built ---
 
 loop.addVerify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const offlineEdits = 50;
 		const _onlineEdits = 30;
 		const conflictsDetected = 3;

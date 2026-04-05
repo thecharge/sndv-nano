@@ -1,43 +1,51 @@
 import { join } from "node:path";
-import { REPORT_SEPARATOR, SNDV_DIR_NAME } from "@thecharge/sndv-config";
-import { MemoryRepository } from "@thecharge/sndv-memory";
-
+import { SNDV_DIR_NAME } from "@thecharge/sndv-config";
+import { buildPromptFragment, MemoryRepository } from "@thecharge/sndv-memory";
+import type { Command } from "./command";
 export interface StatusOpts {
 	projectDir: string;
 }
 
 /** Show project status: hypotheses, memory stats. */
-export const status = async (opts: StatusOpts): Promise<string> => {
-	const memoryRepository = new MemoryRepository({ root: join(opts.projectDir, SNDV_DIR_NAME) });
+export class StatusCommand implements Command {
+	private readonly projectDir: string;
 
-	const hypotheses = await memoryRepository.sessions.listHypotheses();
-	const patterns = await memoryRepository.longTerm.getPatterns();
-	const constraints = await memoryRepository.longTerm.getConstraints();
-
-	const lines = [
-		"SMEP Project Status",
-		REPORT_SEPARATOR,
-		`Hypotheses tracked: ${hypotheses.length}`,
-		`Institutional patterns: ${patterns.length}`,
-		`Learned constraints: ${constraints.length}`,
-	];
-
-	if (hypotheses.length > 0) {
-		lines.push("", "Recent hypotheses:");
-		for (const hypothesis of hypotheses.slice(-5)) {
-			const displayStatus = hypothesis.lastStatus.toUpperCase().padEnd(10);
-			lines.push(`  [${displayStatus}] ${hypothesis.id} (${hypothesis.runs} runs)`);
-		}
+	constructor(opts: StatusOpts) {
+		this.projectDir = opts.projectDir;
 	}
 
-	if (patterns.length > 0) {
-		lines.push("", "Patterns:");
-		for (const pattern of patterns.slice(-5)) {
-			lines.push(
-				`  - ${pattern.pattern} (${(pattern.confidence * 100).toFixed(0)}%, ${pattern.occurrences}x)`,
-			);
-		}
-	}
+	execute = async (): Promise<string> => {
+		const memoryRepository = new MemoryRepository({ root: join(this.projectDir, SNDV_DIR_NAME) });
+		await memoryRepository.init();
 
-	return lines.join("\n");
+		const hypotheses = await memoryRepository.sessions.listHypotheses();
+		const patterns = await memoryRepository.longTerm.getPatterns();
+		const constraints = await memoryRepository.longTerm.getConstraints();
+
+		const summary = [
+			`Hypotheses: ${hypotheses.length}`,
+			`Patterns: ${patterns.length}`,
+			`Constraints: ${constraints.length}`,
+			"",
+			"Recent hypotheses:",
+			...hypotheses.slice(0, 5).map((h) => `  - ${h.id} (${h.lastStatus}, runs: ${h.runs})`),
+			"",
+			"Recent patterns:",
+			...patterns.slice(0, 5).map((p) => `  - ${p.pattern} (confidence: ${p.confidence})`),
+			"",
+			"Prompt fragment:",
+			await buildSummaryFragment(memoryRepository, hypotheses),
+		].join("\n");
+
+		return summary;
+	};
+}
+
+const buildSummaryFragment = async (
+	memoryRepository: MemoryRepository,
+	hypotheses: Array<{ id: string }>,
+): Promise<string> => {
+	if (hypotheses.length === 0) return "No prior context for this hypothesis.";
+	const ctx = await memoryRepository.loadContext(hypotheses[0].id);
+	return buildPromptFragment(ctx);
 };

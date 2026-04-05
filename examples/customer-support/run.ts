@@ -8,7 +8,12 @@
  */
 
 import { MemoryRepository } from "@thecharge/sndv-memory";
-import { DoubleLoop, type TaskContext } from "@thecharge/sndv-nano";
+import {
+	type CycleReport,
+	DoubleLoop,
+	type ExecutionReport,
+	type TaskContextInterface,
+} from "@thecharge/sndv-nano";
 
 const hypothesisId = "ai-customer-support-v1";
 
@@ -40,7 +45,7 @@ const loop = new DoubleLoop(
 // --- FALSIFY: attack the AI support plan ---
 
 loop.addFalsify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const testCases = [
 			{ query: "What's the refund policy for Product X?", productExists: false },
 			{ query: "My warranty expired but I want replacement", policyChanged: true },
@@ -68,7 +73,7 @@ loop.addFalsify(
 );
 
 loop.addFalsify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const confidenceScoringMs = 50;
 		const queueLookupMs = 100;
 		const agentAvailCheckMs = 200;
@@ -91,7 +96,7 @@ loop.addFalsify(
 );
 
 loop.addFalsify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const piiFormats = [
 			"4111-1111-1111-1111",
 			"4111 1111 1111 1111",
@@ -117,7 +122,7 @@ loop.addFalsify(
 // --- DELIVER: implement the pipeline ---
 
 loop.addDeliver(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		ctx.evidence("artifact", "support-pipeline-v1");
 		ctx.evidence("components", [
 			"RAG retriever",
@@ -132,7 +137,7 @@ loop.addDeliver(
 // --- VERIFY: attack what was built ---
 
 loop.addVerify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const _sampleConversations = 100;
 		const aiCsat = 4.3;
 		const humanCsat = 4.5;
@@ -149,18 +154,22 @@ loop.addVerify(
 	{ name: "verify_csat_impact", dependsOn: ["build_pipeline"] },
 );
 
-const cycles = await loop.run();
+const cycles: CycleReport[] = await loop.run();
 console.log(loop.summarize());
 
 // Persist results to memory for next run
 await mem.sessions.recordRun(hypothesisId, {
 	goal: "Validate AI customer support pipeline",
 	status: loop.status,
-	durationMs: cycles.reduce((sum, c) => sum + c.durationMs, 0),
+	durationMs: cycles.reduce((sum, cycle) => sum + cycle.durationMs, 0),
 	iterations: cycles.length,
 	survivingPath: [],
 	prunedPaths: [],
-	taskResults: cycles.flatMap((c) => Object.values(c.phaseReports).flatMap((r) => r.taskResults)),
+	taskResults: cycles.flatMap((cycle) =>
+		Object.values(cycle.phaseReports)
+			.filter((report): report is ExecutionReport => Boolean(report))
+			.flatMap((report) => report.taskResults),
+	),
 });
 
 console.log("\nResults saved to memory. Run again to see context accumulate.");

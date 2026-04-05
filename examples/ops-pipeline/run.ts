@@ -6,7 +6,7 @@
  *
  * Run: bun run examples/ops-pipeline/run.ts
  */
-import { DoubleLoop, type TaskContext } from "@thecharge/sndv-nano";
+import { DoubleLoop, type TaskContextInterface } from "@thecharge/sndv-nano";
 
 const loop = new DoubleLoop(
 	{
@@ -19,7 +19,7 @@ const loop = new DoubleLoop(
 // --- FALSIFY: attack the deployment plan ---
 
 loop.addFalsify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const healthCheckIntervalMs = 10_000;
 		const canaryTrafficPercent = 5;
 		const _errorRateThreshold = 0.01;
@@ -44,7 +44,7 @@ loop.addFalsify(
 );
 
 loop.addFalsify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const imagePullS = 15;
 		const podScheduleS = 10;
 		const healthCheckS = 30;
@@ -69,7 +69,7 @@ loop.addFalsify(
 );
 
 loop.addFalsify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const replicationLagMs = 150;
 		const failoverDetectionMs = 5000;
 		const inconsistencyWindowMs = replicationLagMs + failoverDetectionMs;
@@ -89,7 +89,7 @@ loop.addFalsify(
 // --- DELIVER: implement fixes ---
 
 loop.addDeliver(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		ctx.evidence("artifact", "enhanced-canary-config.yaml");
 		ctx.evidence("changes", [
 			"added memory monitoring",
@@ -103,7 +103,7 @@ loop.addDeliver(
 // --- VERIFY: attack the fixes ---
 
 loop.addVerify(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const auditEvents = ["deploy", "rollback", "scale", "config-change"];
 		const logged = auditEvents.filter(() => true);
 

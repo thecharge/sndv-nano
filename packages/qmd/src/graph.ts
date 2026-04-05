@@ -81,7 +81,13 @@ export class QmdKnowledgeGraph {
 			if (edge.to !== id) continue;
 			ids.add(edge.from);
 		}
-		return [...ids].map((depId) => this.nodes.get(depId)!).filter(Boolean);
+		const nodes: QmdNode[] = [];
+		for (const depId of ids) {
+			const node = this.nodes.get(depId);
+			if (!node) continue;
+			nodes.push(node);
+		}
+		return nodes;
 	};
 
 	getDependencies = (id: string): QmdNode[] => {
@@ -90,7 +96,13 @@ export class QmdKnowledgeGraph {
 			if (edge.from !== id) continue;
 			ids.add(edge.to);
 		}
-		return [...ids].map((depId) => this.nodes.get(depId)!).filter(Boolean);
+		const nodes: QmdNode[] = [];
+		for (const depId of ids) {
+			const node = this.nodes.get(depId);
+			if (!node) continue;
+			nodes.push(node);
+		}
+		return nodes;
 	};
 
 	/** Search the knowledge graph. Delegates to graph-search module. */

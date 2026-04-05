@@ -1,5 +1,6 @@
 import {
 	type Decision,
+	DecisionAction,
 	type EvidenceEntry,
 	MAX_PROMPT_RECENT_DECISIONS,
 	MAX_PROMPT_RECENT_EVIDENCE,
@@ -33,10 +34,10 @@ const appendDecisions = (lines: string[], decisions: Decision[]): void => {
 	if (decisions.length === 0) return;
 	lines.push("### What was already tried");
 
-	const falsified = decisions.filter((d) => d.action === "falsified");
+	const falsified = decisions.filter((d) => d.action === DecisionAction.FALSIFIED);
 	appendDecisionList(lines, falsified, "Failed approaches (DO NOT retry without changes):", true);
 
-	const verified = decisions.filter((d) => d.action === "verified");
+	const verified = decisions.filter((d) => d.action === DecisionAction.VERIFIED);
 	appendDecisionList(lines, verified, "Previously verified (can build on these):", false);
 	lines.push("");
 };

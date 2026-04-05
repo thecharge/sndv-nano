@@ -1,11 +1,7 @@
 import { describe, expect, test } from "bun:test";
+import type { SchedulableTask } from "@thecharge/sndv-config";
 import { CycleDetectedError, ProtocolError } from "@thecharge/sndv-config";
-import {
-	propagatePruning,
-	readyTasks,
-	type SchedulableTask,
-	validateGraph,
-} from "../src/scheduler";
+import { propagatePruning, readyTasks, validateGraph } from "../src/scheduler";
 
 function makeTasks(
 	defs: { id: string; risk: number; dependsOn?: string[]; status?: string }[],

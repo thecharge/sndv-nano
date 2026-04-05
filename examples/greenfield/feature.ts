@@ -8,7 +8,7 @@
  *
  * Run: bun run examples/greenfield/feature.ts
  */
-import { Protocol, summary, type TaskContext } from "@thecharge/sndv-nano";
+import { Protocol, summary, type TaskContextInterface } from "@thecharge/sndv-nano";
 
 const protocol = new Protocol({
 	goal: "Add user profile avatar upload",
@@ -21,7 +21,7 @@ const protocol = new Protocol({
 
 // Highest risk first: can we actually enforce the size limit?
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const oversizedFile = { size: 5_000_000, type: "image/png" };
 		const rejected = oversizedFile.size > 2_000_000;
 
@@ -35,7 +35,7 @@ protocol.addTask(
 
 // Can we bypass format validation?
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const sneakyFormats = ["image/svg+xml", "image/gif", "image/webp"];
 		const allowed = new Set(["image/jpeg", "image/png"]);
 		const allBlocked = sneakyFormats.every((fmt) => !allowed.has(fmt));
@@ -50,7 +50,7 @@ protocol.addTask(
 
 // Only runs if upload validation works: does existing API still work?
 protocol.addTask(
-	async (ctx: TaskContext) => {
+	async (ctx: TaskContextInterface) => {
 		const endpoints = ["/user/profile", "/user/settings"];
 		const allWorking = endpoints.every(() => true); // simulate
 

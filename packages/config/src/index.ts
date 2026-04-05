@@ -2,6 +2,15 @@
 
 // Constants
 export {
+	CLI_COMMAND_ALIASES,
+	CLI_COMMANDS,
+	CLI_COMPLETION_FORMATS,
+	CLI_DEFAULT_SYMLINK_PATH,
+	CLI_DIST_RELATIVE_PATH,
+	CLI_LOCAL_BIN_DIR,
+	CLI_PROTOCOL_ACTIONS,
+	CLI_SCAFFOLD_TARGETS,
+	CLI_TASK_ACTIONS,
 	CONFIG_FILENAME,
 	CONSTRAINTS_FILENAME,
 	DECISIONS_FILENAME,
@@ -34,6 +43,12 @@ export {
 } from "./constants";
 export {
 	ChatRole,
+	CliCommand,
+	CliCompletionFormat,
+	CliFlag,
+	CliProtocolAction,
+	CliScaffoldTarget,
+	CliTaskAction,
 	DecisionAction,
 	LOOP_PHASE_ORDER,
 	LoopOutcome,
@@ -46,6 +61,7 @@ export {
 } from "./enums";
 // Errors
 export {
+	CliErrors,
 	ConstraintViolation,
 	CycleDetectedError,
 	FalsificationError,
@@ -62,6 +78,32 @@ export {
 	SmepErrors,
 	TimeoutExceededError,
 } from "./errors";
+// Templates
+export {
+	buildCliUsage,
+	buildCompletionUsage,
+	buildLinkAlreadyLinked,
+	buildLinkConflict,
+	buildLinkSuccess,
+	buildLinkUsage,
+	buildMemoryUsage,
+	buildProposeUsage,
+	buildProtocolUsage,
+	buildScaffoldUsage,
+	buildTaskUsage,
+} from "./templates/cli";
+export {
+	buildBashCompletion,
+	buildFishCompletion,
+	buildZshCompletion,
+} from "./templates/completion";
+export { buildBrownfieldTemplate, buildGreenfieldTemplate } from "./templates/init";
+export {
+	buildAgentsInstructions,
+	buildClaudeInstructions,
+	buildCopilotInstructions,
+} from "./templates/instructions";
+export { buildDecomposePrompt } from "./templates/propose";
 // Types and schemas — core engine
 export type {
 	CycleReport,
