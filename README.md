@@ -178,9 +178,11 @@ export SNDV_LLM_MODEL="llama3"              # default: "default"
 # Project setup
 sndv init --type greenfield --name my-feature
 sndv scaffold all           # generate CLAUDE.md, copilot-instructions.md, AGENTS.md
+sndv scaffold all --force   # overwrite existing instruction files
 
 # Let the LLM propose tasks from your goal
 sndv propose --goal "Build a rate limiter that survives burst traffic"
+sndv propose --goal "Migrate auth" --type brownfield
 sndv propose --goal-file vision.md   # read a large goal from a file
 sndv propose --goal "Add MFA" --append  # append tasks to existing protocol
 
@@ -313,6 +315,18 @@ const verdict = await client.judgeTask(systemPrompt, "task_name", "description",
 bun run examples/prd-review/run.ts
 bun run examples/customer-support/run.ts
 ```
+
+---
+
+## Demo: End-to-end microservice setup
+
+Run the full workflow (init → scaffold → propose → run → review) in a clean workspace:
+
+```bash
+bash demo/end-to-end-microservice.sh
+```
+
+If you do not have LLM env vars set, the demo falls back to a local protocol template.
 
 ---
 

@@ -79,6 +79,14 @@ describe("scaffold", () => {
 		expect(content).toBe("existing content");
 	});
 
+	test("overwrites existing files with force", async () => {
+		await writeFile(join(tempDir, "CLAUDE.md"), "existing content");
+		const output = await scaffold({ projectDir: tempDir, target: "claude", force: true });
+		expect(output).toContain("overwritten:");
+		const content = await readFile(join(tempDir, "CLAUDE.md"), "utf-8");
+		expect(content).toContain("SNDV Protocol");
+	});
+
 	test("returns usage for invalid target", async () => {
 		const output = await scaffold({ projectDir: tempDir, target: "invalid" });
 		expect(output).toContain("Targets:");

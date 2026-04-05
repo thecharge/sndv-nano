@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { SNDV_DIR_NAME } from "@thecharge/sndv-config";
+import { MAX_TASK_NAME_LENGTH, SNDV_DIR_NAME } from "@thecharge/sndv-config";
 import { parseQmd } from "@thecharge/sndv-qmd";
 
 export interface TaskOpts {
@@ -35,7 +35,11 @@ export const task = async (opts: TaskOpts): Promise<string> => {
 const qmdPath = (projectDir: string): string => join(projectDir, SNDV_DIR_NAME, "protocol.qmd");
 
 const listTasks = async (projectDir: string): Promise<string> => {
-	const doc = await parseQmd(qmdPath(projectDir));
+	const filePath = qmdPath(projectDir);
+	const exists = await ensureQmdExists(filePath);
+	if (!exists) return "Error: protocol.qmd not found. Run `sndv init` first.";
+
+	const doc = await parseQmd(filePath);
 	if (doc.tasks.length === 0) return "No tasks defined in protocol.qmd";
 
 	const lines = doc.tasks.map((t, i) => {
@@ -47,8 +51,14 @@ const listTasks = async (projectDir: string): Promise<string> => {
 
 const addTask = async (opts: TaskOpts): Promise<string> => {
 	if (!opts.name) return "Error: --name is required for task add";
+	if (!isValidTaskName(opts.name)) {
+		return `Error: task name must be snake_case and <= ${MAX_TASK_NAME_LENGTH} chars`;
+	}
 
 	const filePath = qmdPath(opts.projectDir);
+	const exists = await ensureQmdExists(filePath);
+	if (!exists) return "Error: protocol.qmd not found. Run `sndv init` first.";
+
 	const raw = await readFile(filePath, "utf-8");
 
 	const doc = await parseQmd(filePath);
@@ -67,8 +77,14 @@ const addTask = async (opts: TaskOpts): Promise<string> => {
 
 const removeTask = async (opts: TaskOpts): Promise<string> => {
 	if (!opts.name) return "Error: --name is required for task remove";
+	if (!isValidTaskName(opts.name)) {
+		return `Error: task name must be snake_case and <= ${MAX_TASK_NAME_LENGTH} chars`;
+	}
 
 	const filePath = qmdPath(opts.projectDir);
+	const exists = await ensureQmdExists(filePath);
+	if (!exists) return "Error: protocol.qmd not found. Run `sndv init` first.";
+
 	const raw = await readFile(filePath, "utf-8");
 
 	const doc = await parseQmd(filePath);
@@ -91,9 +107,30 @@ const buildTaskBlock = (
 	description?: string,
 ): string => {
 	const lines = [`# Task: ${name}`, `risk: ${risk}`];
-	if (dependsOn) lines.push(`depends_on: [${dependsOn}]`);
+	if (dependsOn) {
+		const deps = dependsOn
+			.split(",")
+			.map((d) => d.trim())
+			.filter(Boolean)
+			.join(", ");
+		if (deps) lines.push(`depends_on: [${deps}]`);
+	}
 	lines.push("", description ?? "Describe what to try to break here.");
 	return lines.join("\n");
 };
 
 const escapeRegex = (s: string): string => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const isValidTaskName = (name: string): boolean => {
+	if (name.length === 0 || name.length > MAX_TASK_NAME_LENGTH) return false;
+	return /^[a-z0-9_]+$/.test(name);
+};
+
+const ensureQmdExists = async (filePath: string): Promise<boolean> => {
+	try {
+		await readFile(filePath, "utf-8");
+		return true;
+	} catch {
+		return false;
+	}
+};

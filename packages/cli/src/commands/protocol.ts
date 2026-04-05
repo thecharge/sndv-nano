@@ -72,6 +72,9 @@ const archiveProtocol = async (opts: ProtocolOpts): Promise<string> => {
 	await mkdir(dir, { recursive: true });
 
 	const archiveName = opts.name ?? `protocol-${Date.now()}`;
+	if (!isValidArchiveName(archiveName)) {
+		return "Error: archive name must be alphanumeric with dashes/underscores";
+	}
 	const dest = join(dir, `${archiveName}.qmd`);
 
 	try {
@@ -81,12 +84,15 @@ const archiveProtocol = async (opts: ProtocolOpts): Promise<string> => {
 		/* does not exist, good */
 	}
 
-	await rename(src, dest);
-	return `Archived current protocol as "${archiveName}"\nRun \`sndv init\` or edit .sndv/protocol.qmd to create a new one.`;
+	await copyFile(src, dest);
+	return `Archived current protocol as "${archiveName}"`;
 };
 
 const restoreProtocol = async (opts: ProtocolOpts): Promise<string> => {
 	if (!opts.name) return "Error: --name is required for protocol restore";
+	if (!isValidArchiveName(opts.name)) {
+		return "Error: archive name must be alphanumeric with dashes/underscores";
+	}
 
 	const src = join(archiveDir(opts.projectDir), `${opts.name}.qmd`);
 
@@ -102,6 +108,7 @@ const restoreProtocol = async (opts: ProtocolOpts): Promise<string> => {
 		await readFile(dest, "utf-8");
 		const backupName = `protocol-${Date.now()}`;
 		const backupDest = join(archiveDir(opts.projectDir), `${backupName}.qmd`);
+		await mkdir(archiveDir(opts.projectDir), { recursive: true });
 		await rename(dest, backupDest);
 	} catch {
 		/* no current protocol to backup */
@@ -110,3 +117,5 @@ const restoreProtocol = async (opts: ProtocolOpts): Promise<string> => {
 	await copyFile(src, dest);
 	return `Restored protocol "${opts.name}" as current`;
 };
+
+const isValidArchiveName = (name: string): boolean => /^[a-zA-Z0-9_-]+$/.test(name);

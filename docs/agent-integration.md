@@ -101,6 +101,9 @@ Alternatively, let the LLM decompose a goal into tasks:
 # Provide a goal — the LLM proposes risk-ordered falsification tasks
 sndv propose --goal "Build a rate limiter that survives burst traffic"
 
+# Brownfield example
+sndv propose --goal "Migrate auth" --type brownfield
+
 # Or read a large goal from a file (PRD, product vision, etc.)
 sndv propose --goal-file prd.md
 
@@ -181,6 +184,7 @@ Instead of creating instruction files manually, run:
 
 ```bash
 sndv scaffold all       # generates CLAUDE.md + copilot-instructions.md + AGENTS.md
+sndv scaffold all --force  # overwrite existing files
 sndv scaffold claude    # only CLAUDE.md
 sndv scaffold copilot   # only .github/copilot-instructions.md
 sndv scaffold opencode  # only AGENTS.md

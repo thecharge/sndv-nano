@@ -28,7 +28,7 @@ loop.addFalsify(
 			"connection pool exhaustion",
 			"gradual latency increase",
 		];
-		const detectable = silentFailureModes.filter(() => Math.random() > 0.3);
+		const detectable = [...silentFailureModes];
 
 		ctx.evidence("health_check_interval_ms", healthCheckIntervalMs);
 		ctx.evidence("canary_traffic_pct", canaryTrafficPercent);

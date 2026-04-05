@@ -1,0 +1,36 @@
+---
+goal: "Microservice monorepo with auth, billing, notifications"
+type: greenfield
+max_iterations: 10
+constraints:
+  - "Services must be independently deployable"
+  - "Shared library must not create runtime coupling"
+  - "API contracts must be backward compatible"
+  - "Local dev workflow must start in under 60 seconds"
+---
+
+# Task: verify_shared_lib_coupling
+risk: 0.9
+
+Try to break independent deployability by introducing a shared library change that forces all services to redeploy.
+
+# Task: verify_contract_compat
+risk: 0.85
+
+Prove that a minor version change in auth breaks billing or notifications clients.
+
+# Task: verify_graceful_degradation
+risk: 0.8
+depends_on: [verify_shared_lib_coupling]
+
+Take auth down and show that billing/notifications fail instead of degrading.
+
+# Task: verify_cross_service_latency
+risk: 0.7
+
+Find a request path that violates the latency budget when auth and billing call each other.
+
+# Task: verify_dev_workflow_speed
+risk: 0.4
+
+demonstrate that local dev startup exceeds the 60-second constraint.

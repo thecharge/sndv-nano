@@ -2,7 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { SNDV_DIR_NAME } from "@thecharge/sndv-config";
 
-const CLAUDE_MD = (_projectName: string): string => `## SNDV Protocol
+const CLAUDE_MD = (projectName: string): string => `## SNDV Protocol — ${projectName}
 
 This project uses SNDV for falsification-first structured execution.
 You are the evaluator — do not call \`sndv run\` (that invokes a second LLM).
@@ -97,6 +97,7 @@ Do NOT run \`sndv run\` (calls a second LLM — you are the evaluator).
 export interface ScaffoldOpts {
 	projectDir: string;
 	target: string;
+	force?: boolean;
 }
 
 const VALID_TARGETS = ["claude", "copilot", "opencode", "all"] as const;
@@ -108,12 +109,19 @@ Targets:
   claude     Generate CLAUDE.md for Claude Code
   copilot    Generate .github/copilot-instructions.md for GitHub Copilot
   opencode   Generate AGENTS.md for opencode
-  all        Generate instruction files for all agents`;
+	all        Generate instruction files for all agents
 
-const writeIfMissing = async (filePath: string, content: string): Promise<string> => {
+Options:
+	--force    Overwrite existing files`;
+
+const writeIfMissing = async (
+	filePath: string,
+	content: string,
+	force?: boolean,
+): Promise<string> => {
 	try {
 		await readFile(filePath, "utf-8");
-		return `  exists: ${filePath} (skipped)`;
+		if (!force) return `  exists: ${filePath} (skipped)`;
 	} catch {
 		const { mkdir } = await import("node:fs/promises");
 		const { dirname } = await import("node:path");
@@ -121,6 +129,9 @@ const writeIfMissing = async (filePath: string, content: string): Promise<string
 		await writeFile(filePath, content, "utf-8");
 		return `  created: ${filePath}`;
 	}
+
+	await writeFile(filePath, content, "utf-8");
+	return `  overwritten: ${filePath}`;
 };
 
 export const scaffold = async (opts: ScaffoldOpts): Promise<string> => {
@@ -139,16 +150,18 @@ export const scaffold = async (opts: ScaffoldOpts): Promise<string> => {
 	const results: string[] = ["Scaffolding agent instruction files:"];
 
 	if (target === "claude" || target === "all") {
-		results.push(await writeIfMissing(join(opts.projectDir, "CLAUDE.md"), CLAUDE_MD(projectName)));
+		results.push(
+			await writeIfMissing(join(opts.projectDir, "CLAUDE.md"), CLAUDE_MD(projectName), opts.force),
+		);
 	}
 
 	if (target === "copilot" || target === "all") {
 		const copilotPath = join(opts.projectDir, ".github", "copilot-instructions.md");
-		results.push(await writeIfMissing(copilotPath, COPILOT_INSTRUCTIONS));
+		results.push(await writeIfMissing(copilotPath, COPILOT_INSTRUCTIONS, opts.force));
 	}
 
 	if (target === "opencode" || target === "all") {
-		results.push(await writeIfMissing(join(opts.projectDir, "AGENTS.md"), AGENTS_MD));
+		results.push(await writeIfMissing(join(opts.projectDir, "AGENTS.md"), AGENTS_MD, opts.force));
 	}
 
 	return results.join("\n");

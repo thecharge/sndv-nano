@@ -1,0 +1,15 @@
+Goal: Build a microservice monorepo with three services (auth, billing, and notifications) plus a shared library.
+
+Constraints:
+- Each service must be deployable independently.
+- Shared library must not create runtime coupling.
+- Services must degrade gracefully if one is down.
+- API contracts must be versioned with backward compatibility.
+- Local developer workflow must run all services in under 60 seconds.
+
+Risks to attack:
+- Shared database schema drift breaks downstream services.
+- Auth service outage causes cascading failures.
+- Shared library change forces multi-service release.
+- Cross-service latency blows SLOs.
+- Dev workflow becomes too slow for iteration.

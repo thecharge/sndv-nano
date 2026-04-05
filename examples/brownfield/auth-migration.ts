@@ -27,7 +27,7 @@ const protocol = new Protocol(
 // Risk 0.95 — if the session store is too slow, nothing else matters
 protocol.addTask(
 	async (ctx: TaskContext) => {
-		const p99LatencyMs = Math.random() * 40 + 5; // 5-45ms (usually passes)
+		const p99LatencyMs = 35.5; // deterministic example value
 
 		ctx.evidence("p99_latency_ms", Math.round(p99LatencyMs * 10) / 10);
 		ctx.evidence("benchmark_samples", 10_000);

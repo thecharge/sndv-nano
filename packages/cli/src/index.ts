@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { ProjectType } from "@thecharge/sndv-config";
 import { init } from "./commands/init";
 import { memory } from "./commands/memory";
@@ -9,7 +12,7 @@ import { scaffold } from "./commands/scaffold";
 import { status } from "./commands/status";
 import { task } from "./commands/task";
 
-const VERSION = "0.1.0";
+const VERSION = resolveVersion();
 
 const USAGE = `sndv — SMEP CLI (v${VERSION})
 
@@ -20,8 +23,8 @@ Usage:
   sndv memory [--export id] [--patterns] [--graduate]
   sndv task <list|add|remove> [--name n] [--risk 0.9] [--depends-on a,b]
   sndv protocol <list|archive|restore> [--name n]
-  sndv propose --goal <text> | --goal-file <path> [--append]
-  sndv scaffold <claude|copilot|opencode|all>
+	sndv propose --goal <text> | --goal-file <path> [--append] [--type greenfield|brownfield]
+	sndv scaffold <claude|copilot|opencode|all> [--force]
   sndv --version
 
 Commands:
@@ -31,8 +34,8 @@ Commands:
   memory     Inspect and manage memory (export, patterns, graduate)
   task       Add, remove, or list tasks in the protocol
   protocol   Archive, restore, or list protocols
-  propose    Ask the LLM to decompose a goal into falsification tasks
-  scaffold   Generate agent instruction files (CLAUDE.md, copilot, AGENTS.md)
+	propose    Ask the LLM to decompose a goal into falsification tasks
+	scaffold   Generate agent instruction files (CLAUDE.md, copilot, AGENTS.md)
 
 Environment (vendor-agnostic):
   SNDV_LLM_API_KEY    API key for any OpenAI-compatible endpoint
@@ -52,6 +55,11 @@ const flag = (name: string): string | undefined => {
 const hasFlag = (name: string): boolean => args.includes(`--${name}`);
 
 const main = async (): Promise<void> => {
+	if (!command || command === "help" || command === "--help" || command === "-h") {
+		console.log(USAGE);
+		return;
+	}
+
 	if (command === "--version" || command === "-v") {
 		console.log(`sndv v${VERSION}`);
 		return;
@@ -129,6 +137,7 @@ const main = async (): Promise<void> => {
 			goal: flag("goal"),
 			goalFile: flag("goal-file"),
 			append: hasFlag("append"),
+			type: flag("type"),
 		});
 		console.log(output);
 		return;
@@ -136,7 +145,11 @@ const main = async (): Promise<void> => {
 
 	if (command === "scaffold") {
 		const target = args[1] ?? "";
-		const output = await scaffold({ projectDir: currentWorkingDir, target });
+		const output = await scaffold({
+			projectDir: currentWorkingDir,
+			target,
+			force: hasFlag("force"),
+		});
 		console.log(output);
 		return;
 	}
@@ -148,3 +161,14 @@ main().catch((error) => {
 	console.error(error instanceof Error ? error.message : String(error));
 	process.exit(1);
 });
+
+function resolveVersion(): string {
+	try {
+		const here = dirname(fileURLToPath(import.meta.url));
+		const pkgPath = join(here, "..", "package.json");
+		const parsed = JSON.parse(readFileSync(pkgPath, "utf-8")) as { version?: string };
+		return parsed.version ?? "0.1.0";
+	} catch {
+		return "0.1.0";
+	}
+}
