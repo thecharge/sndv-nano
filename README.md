@@ -1,5 +1,5 @@
 # sndv-nano
-
+by Radoslav Sandov
 > Stop planning what could work. Start proving what cannot fail.
 
 SNDV implements SMEP (Self-Managing Execution Protocol): a falsification-first workflow that makes you attack your own assumptions before you build. You define constraints, order tasks by risk, and try to break the plan. Whatever survives is what ships.
