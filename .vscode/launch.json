@@ -1,0 +1,48 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug Current Test File",
+			"type": "bun",
+			"request": "launch",
+			"program": "${file}",
+			"cwd": "${workspaceFolder}",
+			"args": ["test"],
+			"env": {}
+		},
+		{
+			"name": "Debug CLI — sndv run",
+			"type": "bun",
+			"request": "launch",
+			"program": "${workspaceFolder}/packages/cli/src/index.ts",
+			"cwd": "${workspaceFolder}",
+			"args": ["run", "--no-llm"],
+			"env": {}
+		},
+		{
+			"name": "Debug CLI — sndv init",
+			"type": "bun",
+			"request": "launch",
+			"program": "${workspaceFolder}/packages/cli/src/index.ts",
+			"cwd": "${workspaceFolder}",
+			"args": ["init", "--type", "greenfield"],
+			"env": {}
+		},
+		{
+			"name": "Debug Example — PRD Review",
+			"type": "bun",
+			"request": "launch",
+			"program": "${workspaceFolder}/examples/prd-review/run.ts",
+			"cwd": "${workspaceFolder}",
+			"env": {}
+		},
+		{
+			"name": "Debug Example — Customer Support",
+			"type": "bun",
+			"request": "launch",
+			"program": "${workspaceFolder}/examples/customer-support/run.ts",
+			"cwd": "${workspaceFolder}",
+			"env": {}
+		}
+	]
+}

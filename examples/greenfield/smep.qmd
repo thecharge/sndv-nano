@@ -1,0 +1,30 @@
+---
+goal: "Add user profile avatar upload"
+type: greenfield
+max_iterations: 10
+constraints:
+  - "Images must be under 2MB"
+  - "Only JPEG and PNG formats"
+  - "No breaking changes to user API"
+---
+
+# Task: verify_upload_size_limit
+risk: 0.9
+
+Try to upload files larger than 2MB.
+The upload should be rejected with a clear error message.
+If you can upload a 5MB file successfully, this task is falsified.
+
+# Task: verify_format_validation
+risk: 0.8
+
+Try to upload non-JPEG/PNG files (SVG, GIF, WebP, BMP).
+Every non-allowed format should be rejected.
+If any non-allowed format gets through, this task is falsified.
+
+# Task: verify_api_compatibility
+risk: 0.6
+depends_on: [verify_upload_size_limit, verify_format_validation]
+
+Verify that existing user API endpoints still work exactly as before.
+Try to break any existing endpoint with the new avatar field present.

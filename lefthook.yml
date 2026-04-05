@@ -1,0 +1,26 @@
+pre-commit:
+  parallel: true
+  commands:
+    format:
+      glob: "*.{ts,tsx,js,jsx}"
+      run: bunx biome check --write {staged_files}
+      stage_fixed: true
+    lint:
+      glob: "*.{ts,tsx,js,jsx}"
+      run: bunx biome lint {staged_files}
+    spellcheck:
+      glob: "*.{ts,md}"
+      run: bunx cspell --no-progress {staged_files}
+    typecheck:
+      run: bunx tsc --noEmit
+    test:
+      run: bun test --recursive
+    secrets:
+      run: bunx secretlint {staged_files}
+
+pre-push:
+  commands:
+    full-check:
+      run: bun run check
+    secrets-full:
+      run: bunx secretlint "**/*"

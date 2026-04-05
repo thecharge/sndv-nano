@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "sourceMap": false,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "paths": {
+      "@thecharge/sndv-config": ["./packages/config/src/index.ts"],
+      "@thecharge/sndv-nano": ["./packages/core/src/index.ts"],
+      "@thecharge/sndv-memory": ["./packages/memory/src/index.ts"],
+      "@thecharge/sndv-adapter": ["./packages/adapter/src/index.ts"],
+      "@thecharge/sndv-qmd": ["./packages/qmd/src/index.ts"],
+      "@thecharge/sndv-cli": ["./packages/cli/src/index.ts"]
+    }
+  },
+  "files": [],
+  "references": [
+    { "path": "packages/config" },
+    { "path": "packages/core" },
+    { "path": "packages/memory" },
+    { "path": "packages/adapter" },
+    { "path": "packages/qmd" },
+    { "path": "packages/cli" }
+  ]
+}

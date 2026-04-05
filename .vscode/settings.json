@@ -1,0 +1,31 @@
+{
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "biomejs.biome",
+	"editor.codeActionsOnSave": {
+		"quickfix.biome": "explicit",
+		"source.organizeImports.biome": "explicit"
+	},
+	"typescript.tsdk": "node_modules/typescript/lib",
+	"typescript.preferences.importModuleSpecifier": "non-relative",
+	"search.exclude": {
+		"**/dist": true,
+		"**/node_modules": true,
+		"**/*.tsbuildinfo": true,
+		"**/coverage": true,
+		"**/.sndv": true
+	},
+	"files.exclude": {
+		"**/*.js": { "when": "$(basename).ts" },
+		"**/*.js.map": true,
+		"**/*.d.ts": { "when": "$(basename).ts" },
+		"**/*.d.ts.map": true,
+		"**/*.tsbuildinfo": true
+	},
+	"cSpell.enabled": true,
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
+}

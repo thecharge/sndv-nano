@@ -1,0 +1,48 @@
+---
+goal: "Evaluate PRD for real-time collaboration feature"
+type: greenfield
+max_iterations: 10
+constraints:
+  - "Must support 100 concurrent users per document"
+  - "Latency for edits must be under 200ms"
+  - "Must work offline with sync on reconnect"
+  - "No data loss on conflict resolution"
+---
+
+# Task: verify_concurrency_model
+risk: 0.95
+
+Can the proposed CRDT-based model actually handle 100 concurrent editors?
+Attack the data structure choice — find scenarios where CRDTs produce
+incorrect merge results or unacceptable memory growth.
+
+# Task: verify_latency_budget
+risk: 0.9
+
+The PRD claims 200ms end-to-end for edits. Can the proposed WebSocket +
+operational transform pipeline actually achieve this under load? Factor in
+serialization, network, conflict resolution, and re-rendering.
+
+# Task: verify_offline_sync
+risk: 0.85
+depends_on: [verify_concurrency_model]
+
+The PRD assumes offline edits can be cleanly merged on reconnect. Try to
+break this: create divergent edit histories that produce conflicts no
+automatic resolver can handle correctly.
+
+# Task: verify_conflict_resolution
+risk: 0.8
+depends_on: [verify_concurrency_model, verify_offline_sync]
+
+Specifically attack the "no data loss" constraint. Create scenarios where
+two users edit the same paragraph simultaneously. Can the system guarantee
+neither edit is silently dropped?
+
+# Task: verify_infrastructure_cost
+risk: 0.6
+depends_on: [verify_latency_budget]
+
+The PRD's infrastructure estimate assumes a single region. Verify whether
+the latency constraint forces multi-region deployment, which would blow
+the cost estimate by 3-5x.

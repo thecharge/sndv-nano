@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# SMEP project data
+.sndv/
+
+# NPM artifacts
+*.tgz
+.npmrc
+
+# Compiled JS (source is TypeScript)
+*.js
+!biome.json
+!lefthook.yml
+*.js.map
+*.d.ts
+*.d.ts.map
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# Coverage
+coverage/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Bun (bun.lock committed for reproducible installs)

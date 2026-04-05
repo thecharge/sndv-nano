@@ -1,0 +1,29 @@
+{
+  "private": true,
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "test": "bun test --recursive",
+    "test:coverage": "bun test --recursive --coverage",
+    "typecheck": "tsc -b",
+    "build": "tsc -b",
+    "build:clean": "rm -rf packages/*/dist packages/*/*.tsbuildinfo && tsc -b",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "spell": "cspell '**/*.{ts,md}'",
+    "check": "bun run lint && bun run typecheck && bun run test",
+    "secrets": "secretlint \"**/*\"",
+    "prepublish:all": "bun run build:clean && bun run check",
+    "publish:dry": "bun run prepublish:all && for pkg in config core memory adapter qmd cli; do cd packages/$pkg && npm pack --dry-run && cd ../..; done",
+    "clean": "rm -rf packages/*/dist packages/*/*.tsbuildinfo"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.0.0",
+    "@secretlint/core": "^11.5.0",
+    "@secretlint/secretlint-rule-preset-recommend": "^11.4.1",
+    "@types/node": "^22.0.0",
+    "cspell": "^8.0.0",
+    "lefthook": "^1.11.0",
+    "secretlint": "^11.4.1",
+    "typescript": "^5.7.0"
+  }
+}

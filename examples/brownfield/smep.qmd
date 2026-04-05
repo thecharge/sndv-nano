@@ -1,0 +1,39 @@
+---
+goal: "Migrate auth from JWT to session tokens"
+type: brownfield
+max_iterations: 15
+constraints:
+  - "Zero downtime during migration"
+  - "No changes to mobile client API contract"
+  - "Must complete within one sprint"
+  - "Must support rollback at any point"
+---
+
+# Task: verify_session_latency
+risk: 0.95
+
+Benchmark the session store. If p99 latency exceeds 50ms,
+the migration is not viable. Try to make it slow — hit it with
+concurrent requests, large payloads, connection pool exhaustion.
+
+# Task: verify_data_integrity
+risk: 0.8
+
+Attempt to create inconsistencies between JWT claims and
+session data. Race conditions, expired-but-cached tokens,
+partial writes during migration.
+
+# Task: test_pool_pressure
+risk: 0.5
+depends_on: [verify_session_latency]
+
+Max out the connection pool. If the session store buckles
+under load, the migration is DOA.
+
+# Task: validate_rollback
+risk: 0.3
+depends_on: [verify_session_latency, verify_data_integrity, test_pool_pressure]
+
+Simulate a failed migration and attempt rollback.
+Every user must be able to authenticate using their existing
+JWT tokens after rollback completes.

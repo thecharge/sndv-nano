@@ -1,0 +1,35 @@
+{
+  "name": "@thecharge/sndv-qmd",
+  "version": "0.1.0",
+  "description": "SMEP QMD parser, knowledge graph with search, and cross-document dependency tracking.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "bun": "./src/index.ts"
+    }
+  },
+  "files": ["dist", "src", "README.md"],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "bun test",
+    "format": "biome check --write src/",
+    "lint": "biome check src/",
+    "check": "bun run lint && tsc --noEmit && bun test",
+    "prepublishOnly": "bun run build"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@thecharge/sndv-config": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  }
+}

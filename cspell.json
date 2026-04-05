@@ -1,0 +1,42 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "sndv",
+    "smep",
+    "thecharge",
+    "falsify",
+    "falsified",
+    "falsification",
+    "opencode",
+    "monorepo",
+    "brownfield",
+    "greenfield",
+    "biome",
+    "cspell",
+    "lefthook",
+    "totp",
+    "Codacy",
+    "crdt",
+    "CRDT",
+    "Ollama",
+    "Schedulable",
+    "bunx",
+    "mypkg",
+    "dedup",
+    "frontmatter",
+    "openrouter",
+    "generativelanguage",
+    "asciinema",
+    "Radoslav",
+    "Sandov"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    ".sndv",
+    "bun.lock",
+    "*.json"
+  ],
+  "dictionaries": ["typescript", "node", "software-terms"]
+}

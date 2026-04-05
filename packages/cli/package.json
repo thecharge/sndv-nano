@@ -1,0 +1,38 @@
+{
+  "name": "@thecharge/sndv-cli",
+  "version": "0.1.0",
+  "description": "SMEP CLI — Run protocols with LLM integration. Works with Claude Code, Copilot, opencode.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "sndv": "dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "bun": "./src/index.ts"
+    }
+  },
+  "files": ["dist", "src", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "test": "bun test",
+    "format": "biome check --write src/",
+    "lint": "biome check src/",
+    "check": "bun run lint && tsc --noEmit && bun test",
+    "prepublishOnly": "bun run build"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@thecharge/sndv-config": "workspace:*",
+    "@thecharge/sndv-nano": "workspace:*",
+    "@thecharge/sndv-memory": "workspace:*",
+    "@thecharge/sndv-adapter": "workspace:*",
+    "@thecharge/sndv-qmd": "workspace:*"
+  }
+}

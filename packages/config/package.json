@@ -1,0 +1,34 @@
+{
+	"name": "@thecharge/sndv-config",
+	"version": "0.1.0",
+	"description": "Unified configuration: enums, types, constants, error factories for SMEP.",
+	"type": "module",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.js",
+			"types": "./dist/index.d.ts",
+			"bun": "./src/index.ts"
+		}
+	},
+	"files": [
+		"dist",
+		"src"
+	],
+	"scripts": {
+		"build": "tsc",
+		"test": "bun test",
+		"prepublishOnly": "bun run build",
+		"format": "biome check --write src/",
+		"lint": "biome check src/",
+		"check": "bun run lint && tsc --noEmit && bun test"
+	},
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"zod": "^3.24.0"
+	}
+}

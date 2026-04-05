@@ -1,0 +1,56 @@
+---
+goal: "Validate AI-powered customer support pipeline"
+type: greenfield
+max_iterations: 10
+constraints:
+  - "Must escalate to human within 30 seconds when confidence < 70%"
+  - "Must not hallucinate policy information"
+  - "Must handle 500 concurrent conversations"
+  - "CSAT must not decrease below current 4.2/5.0"
+  - "PII must never appear in logs or training data"
+---
+
+# Task: verify_hallucination_guard
+risk: 0.95
+
+The AI will cite refund policies, warranty terms, and SLAs. Can it
+hallucinate a policy that doesn't exist? Feed it edge cases: discontinued
+products, regional policy variations, recently changed terms.
+
+# Task: verify_escalation_latency
+risk: 0.9
+
+When the AI's confidence drops below 70%, it should hand off to a human
+in <30s. Measure the actual path: confidence scoring, queue lookup,
+agent availability check, context handoff. What if no agents are available?
+
+# Task: verify_pii_handling
+risk: 0.9
+
+Customers will paste credit card numbers, SSNs, and addresses into chat.
+Verify the PII scrubbing pipeline catches every format. Test: partial
+card numbers, SSNs with dashes/spaces, international phone formats.
+
+# Task: verify_concurrent_load
+risk: 0.8
+depends_on: [verify_hallucination_guard]
+
+At 500 concurrent conversations, each with 4-8 messages, what happens
+to response latency? Does the LLM rate limiter degrade gracefully
+or does the queue grow unbounded?
+
+# Task: verify_csat_impact
+risk: 0.75
+depends_on: [verify_escalation_latency, verify_hallucination_guard]
+
+Compare AI responses against human agent responses for 100 sample
+conversations. Does the AI's tone, accuracy, and resolution rate
+maintain the 4.2/5.0 CSAT baseline?
+
+# Task: verify_training_data_leak
+risk: 0.7
+depends_on: [verify_pii_handling]
+
+After the PII scrubber runs, verify that conversation logs used for
+fine-tuning contain zero PII. Run a PII detection model against the
+scrubbed output — any false negatives are compliance violations.

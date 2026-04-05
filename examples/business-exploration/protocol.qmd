@@ -1,0 +1,54 @@
+---
+goal: "Evaluate product-market fit for AI code review SaaS"
+type: greenfield
+max_iterations: 15
+constraints:
+  - "Must differentiate from GitHub Copilot and CodeRabbit"
+  - "Target market: teams of 10-50 developers"
+  - "Price point: $20-50/seat/month"
+  - "Must reach $1M ARR within 18 months"
+---
+
+# Task: verify_market_differentiation
+risk: 0.95
+
+Can this product actually differentiate from Copilot/CodeRabbit?
+Attack the unique value proposition. If the moat is just "better prompts",
+it's not a moat. Find why a team would switch from an incumbent.
+
+# Task: verify_tam_sizing
+risk: 0.9
+
+The business plan claims 500k potential seats. Verify this.
+How many teams of 10-50 devs exist? What % would pay for AI code review?
+What's the realistic conversion funnel?
+
+# Task: verify_unit_economics
+risk: 0.85
+
+At $30/seat, can you actually run LLM inference profitably?
+Calculate: cost per review (tokens * price), reviews per seat per month,
+gross margin. Factor in GPT-4 class models, not just cheap ones.
+
+# Task: verify_acquisition_channel
+risk: 0.8
+depends_on: [verify_market_differentiation]
+
+How do you actually reach these teams? Developer tools are notoriously
+hard to market. Attack every proposed channel: content marketing, PLG,
+sales-led. What's the realistic CAC?
+
+# Task: verify_retention_model
+risk: 0.75
+depends_on: [verify_unit_economics]
+
+Code review tools have high churn risk — teams adopt, evaluate for a month,
+then drop if ROI isn't obvious. What's the realistic retention curve?
+Can you achieve net negative churn through expansion revenue?
+
+# Task: verify_timeline_to_1m_arr
+risk: 0.7
+depends_on: [verify_tam_sizing, verify_acquisition_channel, verify_retention_model]
+
+Given realistic TAM, conversion, CAC, and churn — can you actually
+hit $1M ARR in 18 months? Build a bottoms-up model and stress-test it.

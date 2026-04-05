@@ -1,0 +1,37 @@
+{
+  "name": "@thecharge/sndv-nano",
+  "version": "0.1.0",
+  "description": "SMEP core engine — Protocol, DoubleLoop, Scheduler, Runner. Falsify-first execution.",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts",
+      "bun": "./src/index.ts",
+      "deno": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "src", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "test": "bun test",
+    "format": "biome check --write src/",
+    "lint": "biome check src/",
+    "check": "bun run lint && tsc --noEmit && bun test",
+    "prepublishOnly": "bun run build"
+  },
+  "keywords": ["smep", "agentic", "llm", "falsification", "protocol", "agent-loop"],
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/thecharge/sndv-nano"
+  },
+  "dependencies": {
+    "@thecharge/sndv-config": "workspace:*"
+  }
+}
