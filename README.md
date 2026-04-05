@@ -183,15 +183,20 @@ More details:
 
 ### Monorepo dependency order
 
-```
-config    ← no internal deps
-    ↑
-core      ← depends on config
-memory    ← depends on config
-adapter   ← depends on config
-qmd       ← depends on config
-    ↑
-cli       ← depends on ALL above
+```mermaid
+graph BT
+    %% Middle layer dependencies on config
+    core --> config
+    memory --> config
+    adapter --> config
+    qmd --> config
+
+    %% CLI dependencies on all above
+    cli --> core
+    cli --> memory
+    cli --> adapter
+    cli --> qmd
+    cli --> config
 ```
 
 ---
