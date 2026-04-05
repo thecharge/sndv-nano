@@ -28,6 +28,12 @@
     "openrouter",
     "generativelanguage",
     "asciinema",
+    "codex",
+    "COMPREPLY",
+    "CWORD",
+    "compgen",
+    "compdef",
+    "esac",
     "Radoslav",
     "Sandov"
   ],

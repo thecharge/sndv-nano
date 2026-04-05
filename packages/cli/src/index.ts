@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ProjectType } from "@thecharge/sndv-config";
+import { completion } from "./commands/completion";
 import { init } from "./commands/init";
 import { memory } from "./commands/memory";
 import { propose } from "./commands/propose";
@@ -17,25 +18,27 @@ const VERSION = resolveVersion();
 const USAGE = `sndv — SMEP CLI (v${VERSION})
 
 Usage:
-  sndv init [--type greenfield|brownfield] [--name project-name]
-  sndv run [--qmd path] [--dry-run] [--no-llm]
-  sndv status
-  sndv memory [--export id] [--patterns] [--graduate]
-  sndv task <list|add|remove> [--name n] [--risk 0.9] [--depends-on a,b]
-  sndv protocol <list|archive|restore> [--name n]
+	sndv init [--type greenfield|brownfield] [--name project-name]
+	sndv run [--qmd path] [--dry-run] [--no-llm]
+	sndv status
+	sndv memory [--export id] [--patterns] [--graduate]
+	sndv task <list|add|remove> [--name n] [--risk 0.9] [--depends-on a,b]
+	sndv protocol <list|archive|restore> [--name n]
 	sndv propose --goal <text> | --goal-file <path> [--append] [--type greenfield|brownfield]
 	sndv scaffold <claude|copilot|opencode|all> [--force]
-  sndv --version
+	sndv completion <bash|zsh|fish>
+	sndv --version
 
 Commands:
   init       Create a new SMEP project in the current directory
   run        Execute protocol — with LLM by default, --no-llm for offline
   status     Show project status and memory summary
   memory     Inspect and manage memory (export, patterns, graduate)
-  task       Add, remove, or list tasks in the protocol
-  protocol   Archive, restore, or list protocols
+	task       Add, remove, or list tasks in the protocol
+	protocol   Archive, restore, or list protocols
 	propose    Ask the LLM to decompose a goal into falsification tasks
 	scaffold   Generate agent instruction files (CLAUDE.md, copilot, AGENTS.md)
+	completion Install shell autocompletion
 
 Environment (vendor-agnostic):
   SNDV_LLM_API_KEY    API key for any OpenAI-compatible endpoint
@@ -116,6 +119,13 @@ const main = async (): Promise<void> => {
 			dependsOn: flag("depends-on"),
 			description: flag("description"),
 		});
+		console.log(output);
+		return;
+	}
+
+	if (command === "completion") {
+		const format = args[1] ?? "";
+		const output = await completion({ format });
 		console.log(output);
 		return;
 	}

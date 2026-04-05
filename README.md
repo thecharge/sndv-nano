@@ -180,6 +180,11 @@ sndv init --type greenfield --name my-feature
 sndv scaffold all           # generate CLAUDE.md, copilot-instructions.md, AGENTS.md
 sndv scaffold all --force   # overwrite existing instruction files
 
+# Shell autocompletion
+sndv completion bash >> ~/.bashrc
+sndv completion zsh >> ~/.zshrc
+sndv completion fish > ~/.config/fish/completions/sndv.fish
+
 # Let the LLM propose tasks from your goal
 sndv propose --goal "Build a rate limiter that survives burst traffic"
 sndv propose --goal "Migrate auth" --type brownfield
@@ -327,6 +332,15 @@ bash demo/end-to-end-microservice.sh
 ```
 
 If you do not have LLM env vars set, the demo falls back to a local protocol template.
+
+### More demos
+
+```bash
+bash demo/standalone.sh
+bash demo/codex-demo.sh
+bash demo/claude-code-demo.sh
+bash demo/copilot-demo.sh
+```
 
 ---
 

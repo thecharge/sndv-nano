@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { completion } from "../src/commands/completion";
 import { protocol } from "../src/commands/protocol";
 import { scaffold } from "../src/commands/scaffold";
 import { task } from "../src/commands/task";
@@ -222,5 +223,29 @@ describe("protocol", () => {
 	test("returns usage for unknown action", async () => {
 		const output = await protocol({ projectDir: tempDir, action: "wat" });
 		expect(output).toContain("Actions:");
+	});
+});
+
+// --- completion ---
+
+describe("completion", () => {
+	test("renders bash completion", async () => {
+		const output = await completion({ format: "bash" });
+		expect(output).toContain("_sndv_complete");
+	});
+
+	test("renders zsh completion", async () => {
+		const output = await completion({ format: "zsh" });
+		expect(output).toContain("#compdef sndv");
+	});
+
+	test("renders fish completion", async () => {
+		const output = await completion({ format: "fish" });
+		expect(output).toContain("complete -c sndv");
+	});
+
+	test("returns usage for unknown format", async () => {
+		const output = await completion({ format: "wat" });
+		expect(output).toContain("completion <bash|zsh|fish>");
 	});
 });
