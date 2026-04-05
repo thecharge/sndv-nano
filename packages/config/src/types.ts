@@ -2,7 +2,7 @@ import { z } from "zod";
 import { LoopPhase, ProtocolOutcome, TaskStatus } from "./enums";
 
 // ---------------------------------------------------------------------------
-// Branded types — validated at system boundaries, zero overhead at runtime
+// Branded types - validated at system boundaries, zero overhead at runtime
 // ---------------------------------------------------------------------------
 
 export const RiskSchema = z.number().min(0).max(1).brand<"Risk">();
@@ -41,7 +41,7 @@ export const LoopPhaseSchema = z.nativeEnum(LoopPhase);
 export const ProtocolOutcomeSchema = z.nativeEnum(ProtocolOutcome);
 
 // ---------------------------------------------------------------------------
-// Task result — what one task produced
+// Task result - what one task produced
 // ---------------------------------------------------------------------------
 
 export interface TaskResult {
@@ -55,7 +55,7 @@ export interface TaskResult {
 }
 
 // ---------------------------------------------------------------------------
-// Execution report — full protocol run result
+// Execution report - full protocol run result
 // ---------------------------------------------------------------------------
 
 export interface ExecutionReport {
@@ -71,7 +71,7 @@ export interface ExecutionReport {
 }
 
 // ---------------------------------------------------------------------------
-// Cycle report — one cycle within the double loop
+// Cycle report - one cycle within the double loop
 // ---------------------------------------------------------------------------
 
 export interface CycleReport {

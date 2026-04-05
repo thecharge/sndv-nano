@@ -31,10 +31,10 @@ You will receive an acknowledgment within 48 hours and a detailed response withi
 
 - **No `eval()` or `Function()` constructors** anywhere in the codebase
 - **No dynamic `import()` from user input**
-- **fetch() only** for LLM calls — no shell exec, no child_process
+- **fetch() only** for LLM calls - no shell exec, no child_process
 - **JSONL append-only writes** prevent memory corruption from concurrent access
 - **Input validation via Zod schemas** at all system boundaries (CLI args, config, LLM responses)
-- **API keys read from environment variables only** — never from config files or CLI args
+- **API keys read from environment variables only** - never from config files or CLI args
 
 ### Dependencies
 

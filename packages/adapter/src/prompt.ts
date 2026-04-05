@@ -13,7 +13,7 @@ export const buildSystemPrompt = (opts: {
 		.map((task) => `  - ${task.name} (risk=${task.risk}, deps=[${task.dependsOn.join(", ")}])`)
 		.join("\n");
 
-	return `You are executing SMEP — the Self-Managing Execution Protocol.
+	return `You are executing SMEP - the Self-Managing Execution Protocol.
 
 GOAL: ${opts.goal}
 

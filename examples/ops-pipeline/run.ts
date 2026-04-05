@@ -1,5 +1,5 @@
 /**
- * Example: Operations pipeline — Falsify a Kubernetes deployment plan.
+ * Example: Operations pipeline - Falsify a Kubernetes deployment plan.
  *
  * Before deploying to production, attack every assumption in the plan.
  * The Double Loop catches issues the planning phase missed.
@@ -62,7 +62,7 @@ loop.addFalsify(
 		ctx.evidence("total_rollback_s", totalS);
 
 		if (totalS > 300) {
-			ctx.falsify(`Rollback takes ${totalS}s — exceeds 5 minute budget`);
+			ctx.falsify(`Rollback takes ${totalS}s - exceeds 5 minute budget`);
 		}
 	},
 	{ name: "verify_rollback_speed", risk: 0.9 },
@@ -79,7 +79,7 @@ loop.addFalsify(
 
 		if (inconsistencyWindowMs > 1000) {
 			ctx.falsify(
-				`${inconsistencyWindowMs}ms inconsistency window during failover — users see stale data`,
+				`${inconsistencyWindowMs}ms inconsistency window during failover - users see stale data`,
 			);
 		}
 	},

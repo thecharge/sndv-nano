@@ -13,7 +13,7 @@ constraints:
 risk: 0.95
 
 Can the canary deployment strategy actually detect regressions before
-full rollout? Attack the monitoring — what failure modes are invisible
+full rollout? Attack the monitoring - what failure modes are invisible
 to the health checks? Can a bad deploy sit in canary undetected?
 
 # Task: verify_rollback_speed
@@ -35,7 +35,7 @@ risk: 0.8
 depends_on: [verify_canary_deployment]
 
 Can Kubernetes secrets be rotated without restarting pods? Test the
-proposed Vault integration under load — what happens when the token
+proposed Vault integration under load - what happens when the token
 lease expires mid-request?
 
 # Task: verify_audit_trail

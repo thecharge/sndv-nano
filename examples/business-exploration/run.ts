@@ -1,5 +1,5 @@
 /**
- * Example: Business exploration — Falsify a SaaS hypothesis.
+ * Example: Business exploration - Falsify a SaaS hypothesis.
  *
  * Use SMEP to attack a business idea before investing time building.
  * Each task tries to KILL the idea, not validate it.
@@ -48,7 +48,7 @@ protocol.addTask(
 		ctx.evidence("tam_annual", tam);
 
 		if (tam < 10_000_000) {
-			ctx.falsify(`TAM too small: $${(tam / 1_000_000).toFixed(1)}M — need >$10M`);
+			ctx.falsify(`TAM too small: $${(tam / 1_000_000).toFixed(1)}M - need >$10M`);
 		}
 	},
 	{ name: "verify_tam_sizing", risk: 0.9 },
@@ -67,7 +67,7 @@ protocol.addTask(
 		ctx.evidence("gross_margin", `${(grossMargin * 100).toFixed(1)}%`);
 
 		if (grossMargin < 0.6) {
-			ctx.falsify(`Gross margin ${(grossMargin * 100).toFixed(1)}% too low — need >60%`);
+			ctx.falsify(`Gross margin ${(grossMargin * 100).toFixed(1)}% too low - need >60%`);
 		}
 	},
 	{ name: "verify_unit_economics", risk: 0.85 },

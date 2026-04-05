@@ -87,7 +87,7 @@ All tests must pass before merge.
 - Never commit secrets. Secretlint runs on every commit.
 - Do not use `eval()` or dynamic code execution.
 - Validate at system boundaries (CLI input, file reads, LLM responses).
-- Report vulnerabilities privately — see [SECURITY.md](SECURITY.md).
+- Report vulnerabilities privately - see [SECURITY.md](SECURITY.md).
 
 ## Pull request checklist
 

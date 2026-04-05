@@ -21,10 +21,10 @@ export const DEFAULT_LLM_TEMPERATURE = 0.2;
 /** Default LLM max tokens for responses. */
 export const DEFAULT_LLM_MAX_TOKENS = 4096;
 
-/** Default LLM model name — vendor-agnostic, override via SNDV_LLM_MODEL. */
+/** Default LLM model name - vendor-agnostic, override via SNDV_LLM_MODEL. */
 export const DEFAULT_LLM_MODEL = "default";
 
-/** Default LLM base URL — override via SNDV_LLM_BASE_URL. */
+/** Default LLM base URL - override via SNDV_LLM_BASE_URL. */
 export const DEFAULT_LLM_BASE_URL = "http://localhost:11434/v1";
 
 /** Environment variable names for LLM configuration (vendor-agnostic). */
@@ -105,10 +105,10 @@ export const CONSTRAINTS_FILENAME = "constraints.jsonl";
 /** Session metadata filename per hypothesis. */
 export const SESSION_META_FILENAME = "session.json";
 
-/** Evidence store filename per hypothesis (JSONL — append-only). */
+/** Evidence store filename per hypothesis (JSONL - append-only). */
 export const EVIDENCE_FILENAME = "evidence.jsonl";
 
-/** Decisions store filename per hypothesis (JSONL — append-only). */
+/** Decisions store filename per hypothesis (JSONL - append-only). */
 export const DECISIONS_FILENAME = "decisions.jsonl";
 
 /** Default protocol QMD filename. */

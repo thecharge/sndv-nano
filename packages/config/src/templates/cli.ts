@@ -9,7 +9,7 @@ import {
 	DEFAULT_LLM_MODEL,
 } from "../constants";
 
-export const buildCliUsage = (version: string): string => `sndv — SMEP CLI (v${version})
+export const buildCliUsage = (version: string): string => `sndv - SMEP CLI (v${version})
 
 Usage:
   sndv init [--type greenfield|brownfield] [--name project-name]
@@ -26,7 +26,7 @@ Usage:
 
 Commands:
   init       Create a new SMEP project in the current directory
-  run        Execute protocol — with LLM by default, --no-llm for offline
+  run        Execute protocol - with LLM by default, --no-llm for offline
   status     Show project status and memory summary
   memory     Inspect and manage memory (export, patterns, graduate)
   task       Add, remove, or list tasks in the protocol

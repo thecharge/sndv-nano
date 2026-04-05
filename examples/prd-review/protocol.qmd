@@ -13,7 +13,7 @@ constraints:
 risk: 0.95
 
 Can the proposed CRDT-based model actually handle 100 concurrent editors?
-Attack the data structure choice — find scenarios where CRDTs produce
+Attack the data structure choice - find scenarios where CRDTs produce
 incorrect merge results or unacceptable memory growth.
 
 # Task: verify_latency_budget

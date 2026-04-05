@@ -1,5 +1,5 @@
 /**
- * Example: PRD Review — Falsify a product requirements document.
+ * Example: PRD Review - Falsify a product requirements document.
  *
  * Instead of rubber-stamping a PRD, SMEP attacks every assumption.
  * Tasks with high risk try hardest to break the plan.
@@ -29,7 +29,7 @@ loop.addFalsify(
 		ctx.evidence("total_memory_mb", totalMemoryMb);
 
 		if (totalMemoryMb > 200) {
-			ctx.falsify(`CRDT memory grows to ${totalMemoryMb}MB for ${maxEditors} users — unacceptable`);
+			ctx.falsify(`CRDT memory grows to ${totalMemoryMb}MB for ${maxEditors} users - unacceptable`);
 		}
 	},
 	{ name: "verify_concurrency_model", risk: 0.95 },
@@ -81,7 +81,7 @@ loop.addVerify(
 		ctx.evidence("conflicts", { detected: conflictsDetected, resolved: conflictsResolved });
 
 		if (conflictsResolved < conflictsDetected) {
-			ctx.falsify(`${conflictsDetected - conflictsResolved} conflicts unresolved — data loss risk`);
+			ctx.falsify(`${conflictsDetected - conflictsResolved} conflicts unresolved - data loss risk`);
 		}
 	},
 	{ name: "verify_offline_sync", dependsOn: ["implement_crdt_engine"] },

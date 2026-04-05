@@ -38,16 +38,16 @@ interface RunData {
 }
 
 /**
- * Medium-term memory — per-hypothesis session files on disk.
+ * Medium-term memory - per-hypothesis session files on disk.
  *
  * Directory layout:
  *   .sndv/sessions/{hypothesis_id}/
- *     session.json      — run metadata (small, atomic JSON)
- *     evidence.jsonl    — captured evidence (append-only JSONL)
- *     decisions.jsonl   — what was tried (append-only JSONL)
+ *     session.json      - run metadata (small, atomic JSON)
+ *     evidence.jsonl    - captured evidence (append-only JSONL)
+ *     decisions.jsonl   - what was tried (append-only JSONL)
  *
  * Evidence and decisions use JSONL for safe append-only writes.
- * No full-file reads needed for writes — prevents memory leaks on large files.
+ * No full-file reads needed for writes - prevents memory leaks on large files.
  */
 export class SessionMemory {
 	private readonly sessionsDir: string;

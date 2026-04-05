@@ -42,7 +42,7 @@ sales-led. What's the realistic CAC?
 risk: 0.75
 depends_on: [verify_unit_economics]
 
-Code review tools have high churn risk — teams adopt, evaluate for a month,
+Code review tools have high churn risk - teams adopt, evaluate for a month,
 then drop if ROI isn't obvious. What's the realistic retention curve?
 Can you achieve net negative churn through expansion revenue?
 
@@ -50,5 +50,5 @@ Can you achieve net negative churn through expansion revenue?
 risk: 0.7
 depends_on: [verify_tam_sizing, verify_acquisition_channel, verify_retention_model]
 
-Given realistic TAM, conversion, CAC, and churn — can you actually
+Given realistic TAM, conversion, CAC, and churn - can you actually
 hit $1M ARR in 18 months? Build a bottoms-up model and stress-test it.

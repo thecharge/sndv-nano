@@ -5,15 +5,15 @@
 ```
 sndv-nano/
 ├── packages/
-│   ├── config/     — Enums, types, constants, error factories
-│   ├── core/       — Protocol, DoubleLoop, scheduler, runner
-│   ├── memory/     — 3-tier memory (short-term, session, long-term)
-│   ├── adapter/    — LLM client, prompt builder, opencode adapter
-│   ├── qmd/        — QMD parser, knowledge graph, search
-│   └── cli/        — CLI commands (init, run, status, memory)
-├── examples/                                 — Working examples by domain
-├── tsconfig.json                             — Root config with path aliases
-└── package.json                              — Workspace root, scripts
+│   ├── config/     - Enums, types, constants, error factories
+│   ├── core/       - Protocol, DoubleLoop, scheduler, runner
+│   ├── memory/     - 3-tier memory (short-term, session, long-term)
+│   ├── adapter/    - LLM client, prompt builder, opencode adapter
+│   ├── qmd/        - QMD parser, knowledge graph, search
+│   └── cli/        - CLI commands (init, run, status, memory)
+├── examples/                                 - Working examples by domain
+├── tsconfig.json                             - Root config with path aliases
+└── package.json                              - Workspace root, scripts
 ```
 
 ## Dependency Graph
@@ -102,7 +102,7 @@ import { Protocol, summary } from "@thecharge/sndv-nano";
 import { MemoryRepository } from "@thecharge/sndv-memory";
 import { QmdKnowledgeGraph } from "@thecharge/sndv-qmd";
 
-// ❌ Wrong — never use relative paths to other packages
+// ❌ Wrong - never use relative paths to other packages
 import { Protocol } from "../../packages/core/src/index";
 ```
 

@@ -13,7 +13,7 @@ export interface RunOpts {
 	noLlm?: boolean;
 }
 
-/** Load protocol from QMD and execute — with LLM by default. */
+/** Load protocol from QMD and execute - with LLM by default. */
 export class RunCommand implements Command {
 	private readonly projectDir: string;
 	private readonly qmdPath?: string;

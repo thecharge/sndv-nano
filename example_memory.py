@@ -8,7 +8,7 @@ This shows the complete flow:
   4. Persist results back to memory
   5. Extract patterns for future runs
 
-Run this twice to see memory in action — the second run
+Run this twice to see memory in action - the second run
 will know what the first run already tried.
 """
 
@@ -123,7 +123,7 @@ async def run_protocol():
 
 async def main():
     print("╔══════════════════════════════════════════════════════════╗")
-    print("║  RUN 1 — First attempt (no prior knowledge)            ║")
+    print("║  RUN 1 - First attempt (no prior knowledge)            ║")
     print("╚══════════════════════════════════════════════════════════╝")
     print()
     await run_protocol()
@@ -131,7 +131,7 @@ async def main():
     print()
     print()
     print("╔══════════════════════════════════════════════════════════╗")
-    print("║  RUN 2 — Second attempt (WITH memory from Run 1)       ║")
+    print("║  RUN 2 - Second attempt (WITH memory from Run 1)       ║")
     print("╚══════════════════════════════════════════════════════════╝")
     print()
     await run_protocol()

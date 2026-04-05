@@ -53,4 +53,4 @@ depends_on: [verify_pii_handling]
 
 After the PII scrubber runs, verify that conversation logs used for
 fine-tuning contain zero PII. Run a PII detection model against the
-scrubbed output — any false negatives are compliance violations.
+scrubbed output - any false negatives are compliance violations.

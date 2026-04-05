@@ -11,7 +11,7 @@
 			"env": {}
 		},
 		{
-			"name": "Debug CLI — sndv run",
+			"name": "Debug CLI - sndv run",
 			"type": "bun",
 			"request": "launch",
 			"program": "${workspaceFolder}/packages/cli/src/index.ts",
@@ -20,7 +20,7 @@
 			"env": {}
 		},
 		{
-			"name": "Debug CLI — sndv init",
+			"name": "Debug CLI - sndv init",
 			"type": "bun",
 			"request": "launch",
 			"program": "${workspaceFolder}/packages/cli/src/index.ts",
@@ -29,7 +29,7 @@
 			"env": {}
 		},
 		{
-			"name": "Debug Example — PRD Review",
+			"name": "Debug Example - PRD Review",
 			"type": "bun",
 			"request": "launch",
 			"program": "${workspaceFolder}/examples/prd-review/run.ts",
@@ -37,7 +37,7 @@
 			"env": {}
 		},
 		{
-			"name": "Debug Example — Customer Support",
+			"name": "Debug Example - Customer Support",
 			"type": "bun",
 			"request": "launch",
 			"program": "${workspaceFolder}/examples/customer-support/run.ts",

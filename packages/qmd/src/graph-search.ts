@@ -1,7 +1,7 @@
 import type { QmdNode, QmdSearchQuery, QmdSearchResult } from "./graph-types";
 
 // ---------------------------------------------------------------------------
-// Search — query the knowledge graph
+// Search - query the knowledge graph
 // ---------------------------------------------------------------------------
 
 /** Search a collection of graph nodes with a structured query. */

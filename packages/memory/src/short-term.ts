@@ -1,5 +1,5 @@
 /**
- * Short-term memory — in-memory only, dies when process exits.
+ * Short-term memory - in-memory only, dies when process exits.
  *
  * This is ctx.evidence() and ctx.shared from the runtime.
  * Fast map with LRU eviction. No persistence.

@@ -1,5 +1,5 @@
 /**
- * Example: Customer support pipeline — Falsify an AI support system.
+ * Example: Customer support pipeline - Falsify an AI support system.
  *
  * Before deploying AI customer support, attack every assumption.
  * This uses the Double Loop with memory to learn across runs.
@@ -89,7 +89,7 @@ loop.addFalsify(
 		ctx.evidence("total_escalation_ms", totalMs);
 
 		if (totalMs > 30_000) {
-			ctx.falsify(`Escalation takes ${totalMs}ms — exceeds 30s budget`);
+			ctx.falsify(`Escalation takes ${totalMs}ms - exceeds 30s budget`);
 		}
 	},
 	{ name: "verify_escalation_latency", risk: 0.9 },
@@ -113,7 +113,7 @@ loop.addFalsify(
 		ctx.evidence("missed", missed);
 
 		if (missed > 0) {
-			ctx.falsify(`PII scrubber missed ${missed} format(s) — compliance violation`);
+			ctx.falsify(`PII scrubber missed ${missed} format(s) - compliance violation`);
 		}
 	},
 	{ name: "verify_pii_handling", risk: 0.9 },

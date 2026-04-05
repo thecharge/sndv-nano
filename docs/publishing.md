@@ -12,12 +12,12 @@ bun run check      # must pass: lint + typecheck + tests
 Packages have a strict dependency order. `config` first, `cli` last.
 
 ```
-1. config    — no internal deps
-2. core      — depends on config
-3. memory    — depends on config
-4. adapter   — depends on config
-5. qmd       — depends on config
-6. cli       — depends on all above
+1. config    - no internal deps
+2. core      - depends on config
+3. memory    - depends on config
+4. adapter   - depends on config
+5. qmd       - depends on config
+6. cli       - depends on all above
 ```
 
 ## Version bump

@@ -67,7 +67,7 @@ const detectCycle = (
 	return visitedCount !== names.size;
 };
 
-/** Return IDs of tasks that are pending with all deps verified — sorted by risk descending. */
+/** Return IDs of tasks that are pending with all deps verified - sorted by risk descending. */
 export const readyTasks = (tasks: Map<string, SchedulableTask>): string[] => {
 	const readyList: SchedulableTask[] = [];
 

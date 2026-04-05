@@ -38,7 +38,7 @@ import { OpencodeAdapter } from "@thecharge/sndv-adapter";
 
 const adapter = new OpencodeAdapter();
 const instruction = adapter.toInstruction(goal, constraints, tasks);
-// → Save to .opencode/smep-context.md
+// -> Save to .opencode/smep-context.md
 ```
 
 ## Configuration

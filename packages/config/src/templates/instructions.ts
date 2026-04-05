@@ -1,20 +1,20 @@
 export const buildClaudeInstructions = (
 	projectName: string,
-): string => `## SNDV Protocol — ${projectName}
+): string => `## SNDV Protocol - ${projectName}
 
 This project uses SNDV for falsification-first structured execution.
-You are the evaluator — do not call \`sndv run\` (that invokes a second LLM).
+You are the evaluator - do not call \`sndv run\` (that invokes a second LLM).
 
 ### Before building
 
 1. Run \`sndv status\` to check hypothesis state and prior runs
-2. Run \`sndv memory --patterns\` to see what has failed before — avoid those
+2. Run \`sndv memory --patterns\` to see what has failed before - avoid those
 3. Read \`.sndv/protocol.qmd\` to see tasks ordered by risk
 
 ### Workflow
 
 - Work through tasks in risk order (highest risk first)
-- For each task, try to BREAK the assumption — not confirm it
+- For each task, try to BREAK the assumption - not confirm it
 - If you falsify a task, skip all tasks that depend on it
 - Build only what survives falsification
 - After finishing, run \`sndv memory --graduate\` to extract patterns
@@ -38,11 +38,11 @@ SNDV is installed globally via \`bun link\` from the sndv-nano repository.
 
 ### Commands
 
-- \`sndv status\` — show hypothesis state and run history
-- \`sndv memory --patterns\` — list recurring failure patterns (avoid repeating these)
-- \`sndv memory --export <id>\` — export full context for a hypothesis
-- \`sndv run --no-llm\` — record protocol execution offline (no LLM call)
-- \`sndv memory --graduate\` — extract patterns from session data
+- \`sndv status\` - show hypothesis state and run history
+- \`sndv memory --patterns\` - list recurring failure patterns (avoid repeating these)
+- \`sndv memory --export <id>\` - export full context for a hypothesis
+- \`sndv run --no-llm\` - record protocol execution offline (no LLM call)
+- \`sndv memory --graduate\` - extract patterns from session data
 
 ### Workflow
 
@@ -57,7 +57,7 @@ SNDV is installed globally via \`bun link\` from the sndv-nano repository.
 
 Run \`sndv init\` to create \`.sndv/protocol.qmd\`, then edit it with your goal, constraints, and tasks.
 
-Do NOT run \`sndv run\` — that calls a second LLM. You are the evaluator.
+Do NOT run \`sndv run\` - that calls a second LLM. You are the evaluator.
 `;
 
 export const buildAgentsInstructions = (): string => `## SNDV Protocol
@@ -67,9 +67,9 @@ SNDV is installed globally (\`sndv\` command available in shell).
 
 ### Before building
 
-1. \`sndv status\` — check hypothesis state
-2. \`sndv memory --patterns\` — see repeated failures (do NOT repeat these)
-3. Read \`.sndv/protocol.qmd\` — tasks ordered by risk
+1. \`sndv status\` - check hypothesis state
+2. \`sndv memory --patterns\` - see repeated failures (do NOT repeat these)
+3. Read \`.sndv/protocol.qmd\` - tasks ordered by risk
 
 ### Workflow
 
@@ -86,8 +86,8 @@ Edit \`.sndv/protocol.qmd\` with your goal, constraints, and risk-ordered tasks.
 
 ### Recording
 
-- \`sndv run --no-llm\` — record execution offline
-- \`sndv memory --graduate\` — extract patterns from sessions
+- \`sndv run --no-llm\` - record execution offline
+- \`sndv memory --graduate\` - extract patterns from sessions
 
-Do NOT run \`sndv run\` (calls a second LLM — you are the evaluator).
+Do NOT run \`sndv run\` (calls a second LLM - you are the evaluator).
 `;

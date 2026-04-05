@@ -1,7 +1,7 @@
 {
   "name": "@thecharge/sndv-cli",
   "version": "0.1.0",
-  "description": "SMEP CLI — Run protocols with LLM integration. Works with Claude Code, Copilot, opencode.",
+  "description": "SMEP CLI - Run protocols with LLM integration. Works with Claude Code, Copilot, opencode.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

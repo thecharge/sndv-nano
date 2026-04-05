@@ -4,9 +4,9 @@ Example: The Double Loop in action.
 Scenario: Build a rate limiter for an API.
 
 Cycle 1:
-  FALSIFY  → Can we even do token bucket at our scale?
-  DELIVER  → Build the rate limiter
-  VERIFY   → Does it actually hold under load?
+  FALSIFY  -> Can we even do token bucket at our scale?
+  DELIVER  -> Build the rate limiter
+  VERIFY   -> Does it actually hold under load?
 
 If verification fails, the loop cycles again with the surviving paths.
 """

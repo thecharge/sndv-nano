@@ -1,5 +1,5 @@
 /**
- * SMEP Error Hierarchy — all errors originate from factories, never raw `throw new`.
+ * SMEP Error Hierarchy - all errors originate from factories, never raw `throw new`.
  *
  * Usage:
  *   throw SmepErrors.protocolEmpty()
@@ -8,7 +8,7 @@
  */
 
 // ---------------------------------------------------------------------------
-// Error classes (internal — consumers use factories below)
+// Error classes (internal - consumers use factories below)
 // ---------------------------------------------------------------------------
 
 class ProtocolError extends Error {
@@ -114,7 +114,7 @@ export const isLlmResponseParseError = (error: unknown): error is LlmResponsePar
 	error instanceof LlmResponseParseError;
 
 // ---------------------------------------------------------------------------
-// Error factories — the only way to create errors in SMEP
+// Error factories - the only way to create errors in SMEP
 // ---------------------------------------------------------------------------
 
 export const SmepErrors = {

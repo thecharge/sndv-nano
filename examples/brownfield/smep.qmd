@@ -13,7 +13,7 @@ constraints:
 risk: 0.95
 
 Benchmark the session store. If p99 latency exceeds 50ms,
-the migration is not viable. Try to make it slow — hit it with
+the migration is not viable. Try to make it slow - hit it with
 concurrent requests, large payloads, connection pool exhaustion.
 
 # Task: verify_data_integrity

@@ -26,9 +26,9 @@ import { buildProviderRequest, detectProvider, parseProviderResponse } from "./p
  *  - Anthropic Claude (native Messages API)
  *
  * Configure via environment variables:
- *   SNDV_LLM_API_KEY   — API key
- *   SNDV_LLM_BASE_URL  — endpoint (default: http://localhost:11434/v1)
- *   SNDV_LLM_MODEL     — model name (default: "default")
+ *   SNDV_LLM_API_KEY   - API key
+ *   SNDV_LLM_BASE_URL  - endpoint (default: http://localhost:11434/v1)
+ *   SNDV_LLM_MODEL     - model name (default: "default")
  */
 export class LlmClient {
 	private readonly config: LlmConfig;
@@ -78,7 +78,7 @@ export class LlmClient {
 				"",
 				taskDescription,
 				"",
-				"TRY TO BREAK THIS — look for why it would fail, not why it would work.",
+				"TRY TO BREAK THIS - look for why it would fail, not why it would work.",
 				"",
 				"Respond in valid JSON:",
 				'{"task":"<name>","status":"verified"|"falsified","evidence":{"key":"value"},"reason":"..."}',

@@ -11,9 +11,9 @@ export type { TaskFn };
  * Runtime toolbox injected into every task.
  *
  * Three things you do with it:
- *   - Record what you observe  → ctx.evidence("key", value)
- *   - Declare something broke  → ctx.falsify("reason")
- *   - Run sub-work with timeout → ctx.run(fn, ...args)
+ *   - Record what you observe  -> ctx.evidence("key", value)
+ *   - Declare something broke  -> ctx.falsify("reason")
+ *   - Run sub-work with timeout -> ctx.run(fn, ...args)
  */
 export class TaskContext implements TaskContextInterface {
 	readonly taskId: string;
@@ -81,7 +81,7 @@ export class TaskContext implements TaskContextInterface {
 		return { ...this.evidenceStore };
 	};
 
-	/** Clear all active timers — call after task completes to prevent leaks. */
+	/** Clear all active timers - call after task completes to prevent leaks. */
 	clearTimers = (): void => {
 		for (const timerId of this.activeTimerIds) {
 			clearTimeout(timerId);

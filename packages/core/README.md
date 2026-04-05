@@ -41,7 +41,7 @@ const report = await protocol.execute();
 console.log(summary(report));
 ```
 
-### Double Loop (Falsify → Deliver → Verify)
+### Double Loop (Falsify -> Deliver -> Verify)
 
 ```typescript
 import { DoubleLoop, type TaskContextInterface } from "@thecharge/sndv-nano";

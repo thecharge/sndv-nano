@@ -24,7 +24,7 @@ interface InternalTask extends SchedulableTask, RunnableTask {
 	result?: TaskResult;
 }
 
-/** The SMEP execution engine. Orchestrates hypothesis → tasks → report. */
+/** The SMEP execution engine. Orchestrates hypothesis -> tasks -> report. */
 export class Protocol {
 	readonly hypothesis: Hypothesis;
 	private readonly config: ProtocolConfig;

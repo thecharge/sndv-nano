@@ -1,6 +1,6 @@
 import type { QmdDocument } from "@thecharge/sndv-config";
 
-/** A node in the knowledge graph — one indexed QMD document. */
+/** A node in the knowledge graph - one indexed QMD document. */
 export interface QmdNode {
 	/** Absolute file path (or virtual id for string-loaded docs). */
 	id: string;

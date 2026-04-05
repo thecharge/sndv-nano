@@ -15,7 +15,7 @@ import { ShortTermMemory } from "./short-term";
 /**
  * Unified access to all 3 memory tiers. (Repository pattern)
  *
- *   Short-term:  runtime Map — ctx.evidence(), ctx.shared
+ *   Short-term:  runtime Map - ctx.evidence(), ctx.shared
  *   Medium-term: per-hypothesis session files on disk
  *   Long-term:   institutional patterns + learned constraints
  */
@@ -54,7 +54,7 @@ export class MemoryRepository {
 		return buildPromptFragment(ctx);
 	}
 
-	/** Scan sessions for repeated failures → record as patterns. */
+	/** Scan sessions for repeated failures -> record as patterns. */
 	async graduatePatterns(opts?: { minOccurrences?: number }): Promise<Pattern[]> {
 		const patterns = await extractPatterns(this.sessions, opts);
 		for (const p of patterns) {

@@ -100,7 +100,7 @@ Tasks are ordered by `risk` (0.0–1.0). Higher risk = evaluate first. If a task
 Alternatively, let the LLM decompose a goal into tasks:
 
 ```bash
-# Provide a goal — the LLM proposes risk-ordered falsification tasks
+# Provide a goal - the LLM proposes risk-ordered falsification tasks
 sndv propose --goal "Build a rate limiter that survives burst traffic"
 
 # Brownfield example
@@ -130,7 +130,7 @@ Two modes:
 | Mode | Command | Who reasons |
 |---|---|---|
 | **With LLM** | `sndv run` | LLM API (configured via `SNDV_LLM_*` env vars) |
-| **Offline** | `sndv run --no-llm` | Records structure only — no LLM call |
+| **Offline** | `sndv run --no-llm` | Records structure only - no LLM call |
 | **Inside agent** | Agent reads protocol directly | Agent is the evaluator |
 
 ### Step 4: Review and refine
@@ -153,7 +153,7 @@ Extracts recurring failure patterns from session data into `patterns.jsonl`. The
 
 ## The agent is the evaluator
 
-When a coding agent uses SNDV, there is no reason to call a second LLM. The agent reads the protocol, evaluates each task with its own reasoning, and uses SNDV commands to read history and record outcomes. SNDV provides structure (protocol, memory, patterns) — the agent provides the brain.
+When a coding agent uses SNDV, there is no reason to call a second LLM. The agent reads the protocol, evaluates each task with its own reasoning, and uses SNDV commands to read history and record outcomes. SNDV provides structure (protocol, memory, patterns) - the agent provides the brain.
 
 ```mermaid
 flowchart LR
@@ -208,18 +208,18 @@ Create a `CLAUDE.md` file in your project root (or `.claude/CLAUDE.md`):
 ## SNDV Protocol
 
 This project uses SNDV for falsification-first structured execution.
-You are the evaluator — do not call `sndv run` (that invokes a second LLM).
+You are the evaluator - do not call `sndv run` (that invokes a second LLM).
 
 ### Before building
 
 1. Run `sndv status` to check hypothesis state and prior runs
-2. Run `sndv memory --patterns` to see what has failed before — avoid those
+2. Run `sndv memory --patterns` to see what has failed before - avoid those
 3. Read `.sndv/protocol.qmd` to see tasks ordered by risk
 
 ### Workflow
 
 - Work through tasks in risk order (highest risk first)
-- For each task, try to BREAK the assumption — not confirm it
+- For each task, try to BREAK the assumption - not confirm it
 - If you falsify a task, skip all tasks that depend on it
 - Build only what survives falsification
 - After finishing, run `sndv memory --graduate` to extract patterns
@@ -295,11 +295,11 @@ SNDV is installed globally via `bun link` from the sndv-nano repository.
 
 ### Commands
 
-- `sndv status` — show hypothesis state and run history
-- `sndv memory --patterns` — list recurring failure patterns (avoid repeating these)
-- `sndv memory --export <id>` — export full context for a hypothesis
-- `sndv run --no-llm` — record protocol execution offline (no LLM call)
-- `sndv memory --graduate` — extract patterns from session data
+- `sndv status` - show hypothesis state and run history
+- `sndv memory --patterns` - list recurring failure patterns (avoid repeating these)
+- `sndv memory --export <id>` - export full context for a hypothesis
+- `sndv run --no-llm` - record protocol execution offline (no LLM call)
+- `sndv memory --graduate` - extract patterns from session data
 
 ### Workflow
 
@@ -314,7 +314,7 @@ SNDV is installed globally via `bun link` from the sndv-nano repository.
 
 Run `sndv init` to create `.sndv/protocol.qmd`, then edit it with your goal, constraints, and tasks.
 
-Do NOT run `sndv run` — that calls a second LLM. You are the evaluator.
+Do NOT run `sndv run` - that calls a second LLM. You are the evaluator.
 ```
 
 For path-specific instructions, create `.github/instructions/sndv.instructions.md`:
@@ -330,7 +330,7 @@ Files in `.sndv/` are SNDV protocol files. `protocol.qmd` uses YAML frontmatter
 Do not delete or restructure the `.sndv/` directory.
 ```
 
-Copilot also reads `AGENTS.md` if present (see opencode section below — `AGENTS.md` is shared between tools).
+Copilot also reads `AGENTS.md` if present (see opencode section below - `AGENTS.md` is shared between tools).
 
 ## opencode
 
@@ -350,9 +350,9 @@ SNDV is installed globally (`sndv` command available in shell).
 
 ### Before building
 
-1. `sndv status` — check hypothesis state
-2. `sndv memory --patterns` — see repeated failures (do NOT repeat these)
-3. Read `.sndv/protocol.qmd` — tasks ordered by risk
+1. `sndv status` - check hypothesis state
+2. `sndv memory --patterns` - see repeated failures (do NOT repeat these)
+3. Read `.sndv/protocol.qmd` - tasks ordered by risk
 
 ### Workflow
 
@@ -369,10 +369,10 @@ Edit `.sndv/protocol.qmd` with your goal, constraints, and risk-ordered tasks.
 
 ### Recording
 
-- `sndv run --no-llm` — record execution offline
-- `sndv memory --graduate` — extract patterns from sessions
+- `sndv run --no-llm` - record execution offline
+- `sndv memory --graduate` - extract patterns from sessions
 
-Do NOT run `sndv run` (calls a second LLM — you are the evaluator).
+Do NOT run `sndv run` (calls a second LLM - you are the evaluator).
 ```
 
 `AGENTS.md` is also read by GitHub Copilot and (as a fallback) Claude Code, so one file works for multiple tools.
@@ -396,7 +396,7 @@ permission:
 You are evaluating a SNDV protocol. For each task in `.sndv/protocol.qmd`:
 
 1. Read the task description
-2. Try to falsify the assumption — find a way to break it
+2. Try to falsify the assumption - find a way to break it
 3. If you falsify it, report the evidence and skip dependent tasks
 4. If you cannot falsify it, proceed to implement
 
@@ -466,7 +466,7 @@ sequenceDiagram
 | Command | Returns |
 |---|---|
 | `sndv status` | Hypothesis state, run count, last outcome |
-| `sndv memory --patterns` | Recurring failure patterns — avoid repeating |
+| `sndv memory --patterns` | Recurring failure patterns - avoid repeating |
 | `sndv memory --export <id>` | Full context: prior runs, evidence, decisions, constraints |
 | `cat .sndv/protocol.qmd` | Protocol definition: goal, constraints, tasks with risk scores |
 | `sndv run --no-llm` | Structured offline execution report (no LLM call) |
@@ -505,19 +505,19 @@ flowchart TB
         ST[Current run evidence, LRU-evicted]
     end
     subgraph Session["Session (disk, JSONL)"]
-        SE[evidence.jsonl — append-only]
-        SD[decisions.jsonl — append-only]
+        SE[evidence.jsonl - append-only]
+        SD[decisions.jsonl - append-only]
     end
     subgraph LongTerm["Long-term (disk, JSONL)"]
-        LP[patterns.jsonl — institutional patterns]
-        LC[constraints.jsonl — learned constraints]
+        LP[patterns.jsonl - institutional patterns]
+        LC[constraints.jsonl - learned constraints]
     end
     ShortTerm -->|"sndv run --no-llm"| Session
     Session -->|"sndv memory --graduate"| LongTerm
     LongTerm -->|loaded as context| ShortTerm
 ```
 
-JSONL format: one JSON object per line. Evidence and decisions are appended line-by-line — no read-before-write. Patterns and constraints are rewritten on graduate.
+JSONL format: one JSON object per line. Evidence and decisions are appended line-by-line - no read-before-write. Patterns and constraints are rewritten on graduate.
 
 Each session's failures feed into the next session's context. The agent sees what failed before via `sndv memory --patterns` and avoids repeating mistakes.
 

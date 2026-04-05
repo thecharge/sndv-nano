@@ -207,7 +207,7 @@ A **goal** is a hypothesis you are trying to falsify. You define it in `protocol
 
 ### What happens when you run
 
-1. The scheduler sorts tasks by **risk descending** (highest risk first — fail-fast strategy)
+1. The scheduler sorts tasks by **risk descending** (highest risk first - fail-fast strategy)
 2. Tasks with satisfied dependencies run in parallel batches
 3. Each task either **verifies** (could not break it) or **falsifies** (found a way to break it)
 4. After each batch, **pruning** propagates: if a task is falsified/errored, all downstream dependents are automatically **skipped**
@@ -215,10 +215,10 @@ A **goal** is a hypothesis you are trying to falsify. You define it in `protocol
 
 ### How a goal completes
 
-| All tasks verified | → `VERIFIED` — the hypothesis survived all attacks |
+|All tasks verified | -> `VERIFIED` - the hypothesis survived all attacks |
 |---|---|
-| **Any task falsified** | → `FALSIFIED` — the hypothesis has a known weakness |
-| **Tasks errored (none falsified)** | → `ERRORED` — evaluation itself failed |
+| **Any task falsified** | -> `FALSIFIED` - the hypothesis has a known weakness |
+| **Tasks errored (none falsified)** | -> `ERRORED` - evaluation itself failed |
 
 The result is an `ExecutionReport`:
 
@@ -242,12 +242,12 @@ Surviving path:
 SNDV does **not** auto-advance to a next goal. Each protocol run is independent. After a run:
 
 1. Results are persisted to `.sndv/sessions/{hypothesis_id}/`
-2. You review the report — `sndv status`
-3. You edit `protocol.qmd` — add tasks, change risk scores, adjust constraints
-4. You run again — results **accumulate** across runs (session memory appends)
+2. You review the report - `sndv status`
+3. You edit `protocol.qmd` - add tasks, change risk scores, adjust constraints
+4. You run again - results **accumulate** across runs (session memory appends)
 5. Over time, `sndv memory --graduate` extracts patterns from repeated failures
 
-The workflow is iterative: **define → attack → review → refine → attack again**.
+The workflow is iterative: **define -> attack -> review -> refine -> attack again**.
 
 ---
 
@@ -286,9 +286,9 @@ Try to make the service fall over under 10k req/s.
 
 **Risk** is a number from `0.0` to `1.0` that you assign to each task. It represents how likely you think this task will **falsify** the hypothesis.
 
-- `0.9` — "I strongly suspect this will fail" → evaluate first
-- `0.5` — default, no strong opinion
-- `0.1` — "This is probably fine" → evaluate last
+- `0.9` - "I strongly suspect this will fail" -> evaluate first
+- `0.5` - default, no strong opinion
+- `0.1` - "This is probably fine" -> evaluate last
 
 The scheduler sorts tasks by risk **descending**. Higher-risk tasks execute first. This is a **fail-fast** strategy: if the riskiest assumption breaks, all its dependents are pruned immediately, saving time.
 
@@ -298,7 +298,7 @@ Risk is **not computed automatically**. You set it based on your judgment. After
 
 Use `depends_on: [task_name]` to declare dependencies. A task only runs when all its dependencies are `VERIFIED`. If any dependency is falsified, errored, or timed out, the task is automatically **skipped** (pruned).
 
-Pruning is **transitive**: if A fails → B is skipped → C (which depends on B) is also skipped.
+Pruning is **transitive**: if A fails -> B is skipped -> C (which depends on B) is also skipped.
 
 ### Task statuses
 
@@ -306,7 +306,7 @@ Pruning is **transitive**: if A fails → B is skipped → C (which depends on B
 |---|---|
 | `pending` | Not yet evaluated |
 | `running` | Currently being evaluated |
-| `verified` | Could not break it — assumption holds |
+| `verified` | Could not break it - assumption holds |
 | `falsified` | Found evidence that breaks it |
 | `errored` | Evaluation itself failed (exception, timeout in LLM) |
 | `skipped` | Pruned because an upstream dependency failed |
@@ -326,7 +326,7 @@ Every `sndv run` writes results to disk. Nothing is lost.
 | `evidence.jsonl` | JSONL (append-only) | One line per evidence key-value from each task: `{ key, value, task, hypothesisId, timestamp, runId, status }` |
 | `decisions.jsonl` | JSONL (append-only) | One line per task result: `{ task, action, reason, evidence, timestamp, runId }` |
 
-Evidence and decisions are **append-only** — every run adds lines, nothing is overwritten. You get a full history of every evaluation across all runs.
+Evidence and decisions are **append-only** - every run adds lines, nothing is overwritten. You get a full history of every evaluation across all runs.
 
 ### Long-term memory: `.sndv/memory/`
 
@@ -341,7 +341,7 @@ Run `sndv memory --graduate` to scan all sessions for repeated failures:
 
 1. Collects all `FALSIFIED` decisions across all hypotheses
 2. Groups by normalized failure reason (numbers stripped, lowercased)
-3. If a failure reason appears **3 or more times** across different hypotheses → creates a pattern
+3. If a failure reason appears **3 or more times** across different hypotheses -> creates a pattern
 4. Pattern includes: confidence score, occurrence count, source hypotheses, auto-generated tags
 
 Patterns are loaded as context in future runs. The system learns from repeated mistakes.
@@ -363,10 +363,10 @@ flowchart TD
 
 ## Docs
 
-- [Developer Guide](docs/dev-guide.md) — Monorepo structure, adding packages, code conventions
-- [Agent Integration](docs/agent-integration.md) — Claude Code, Copilot, opencode, self-improvement loops
-- [Contributing](CONTRIBUTING.md) — Code standards, branch workflow, PR checklist
-- [Security](SECURITY.md) — Vulnerability reporting, security hardening
+- [Developer Guide](docs/dev-guide.md) - Monorepo structure, adding packages, code conventions
+- [Agent Integration](docs/agent-integration.md) - Claude Code, Copilot, opencode, self-improvement loops
+- [Contributing](CONTRIBUTING.md) - Code standards, branch workflow, PR checklist
+- [Security](SECURITY.md) - Vulnerability reporting, security hardening
 
 ---
 ## License

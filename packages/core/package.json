@@ -1,7 +1,7 @@
 {
   "name": "@thecharge/sndv-nano",
   "version": "0.1.0",
-  "description": "SMEP core engine — Protocol, DoubleLoop, Scheduler, Runner. Falsify-first execution.",
+  "description": "SMEP core engine - Protocol, DoubleLoop, Scheduler, Runner. Falsify-first execution.",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

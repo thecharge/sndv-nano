@@ -31,7 +31,7 @@ export const parseJsonlString = <T>(raw: string): T[] => {
 		try {
 			results.push(JSON.parse(trimmed));
 		} catch {
-			// Skip malformed lines — partial writes from interrupted flushes
+			// Skip malformed lines - partial writes from interrupted flushes
 		}
 	}
 	return results;

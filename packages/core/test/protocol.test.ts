@@ -4,7 +4,7 @@ import { Protocol, summary, type TaskContextInterface } from "../src/index";
 describe("Protocol", () => {
 	// ===== Happy flows =====
 
-	test("all tasks verified → report status is verified", async () => {
+	test("all tasks verified -> report status is verified", async () => {
 		const p = new Protocol({ goal: "Test", constraints: ["no bugs"] });
 
 		p.addTask(

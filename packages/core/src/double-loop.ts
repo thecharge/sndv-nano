@@ -30,12 +30,12 @@ interface LoopTask {
 }
 
 /**
- * The Double Loop — a converging spiral that drives from idea to verified solution.
+ * The Double Loop - a converging spiral that drives from idea to verified solution.
  *
  * Three interlocking phases:
- *   1. FALSIFY — Attack the plan. Can this even work?
- *   2. DELIVER — Build what survived. Ship the thing.
- *   3. VERIFY  — Attack what was built. Does it actually work?
+ *   1. FALSIFY - Attack the plan. Can this even work?
+ *   2. DELIVER - Build what survived. Ship the thing.
+ *   3. VERIFY  - Attack what was built. Does it actually work?
  *
  * The loop converges because every cycle either verifies a task (done)
  * or kills it (pruned). Total work monotonically decreases.
@@ -58,15 +58,15 @@ export class DoubleLoop {
 		return this;
 	};
 
-	/** Register a falsification task — tries to break the plan. */
+	/** Register a falsification task - tries to break the plan. */
 	addFalsify = (taskFn: TaskFn, opts: LoopTaskOpts): this =>
 		this.register(LoopPhase.FALSIFY, taskFn, opts);
 
-	/** Register a delivery task — builds what survived. */
+	/** Register a delivery task - builds what survived. */
 	addDeliver = (taskFn: TaskFn, opts: LoopTaskOpts): this =>
 		this.register(LoopPhase.DELIVER, taskFn, { ...opts, retry: opts.retry ?? 1 });
 
-	/** Register a verification task — attacks what was built. */
+	/** Register a verification task - attacks what was built. */
 	addVerify = (taskFn: TaskFn, opts: LoopTaskOpts): this =>
 		this.register(LoopPhase.VERIFY, taskFn, opts);
 

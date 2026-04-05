@@ -1,5 +1,5 @@
 /**
- * SMEP Enums — every enum in the system lives here.
+ * SMEP Enums - every enum in the system lives here.
  *
  * No string literals anywhere. Import from @thecharge/sndv-config.
  */
@@ -15,7 +15,7 @@ export enum TaskStatus {
 	TIMED_OUT = "timed_out",
 }
 
-/** Terminal statuses — once a task reaches one, it never moves forward. */
+/** Terminal statuses - once a task reaches one, it never moves forward. */
 export const TERMINAL_STATUSES: ReadonlySet<TaskStatus> = new Set([
 	TaskStatus.FALSIFIED,
 	TaskStatus.ERRORED,

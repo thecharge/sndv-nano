@@ -24,7 +24,7 @@ const protocol = new Protocol(
 	{ maxIterations: 15 },
 );
 
-// Risk 0.95 — if the session store is too slow, nothing else matters
+// Risk 0.95 - if the session store is too slow, nothing else matters
 protocol.addTask(
 	async (ctx: TaskContextInterface) => {
 		const p99LatencyMs = 35.5; // deterministic example value
@@ -39,7 +39,7 @@ protocol.addTask(
 	{ name: "verify_session_latency", risk: 0.95 },
 );
 
-// Risk 0.8 — data integrity during dual-write is treacherous
+// Risk 0.8 - data integrity during dual-write is treacherous
 protocol.addTask(
 	async (ctx: TaskContextInterface) => {
 		const racesDetected = 0; // simulate: no races found
@@ -54,7 +54,7 @@ protocol.addTask(
 	{ name: "verify_data_integrity", risk: 0.8 },
 );
 
-// Risk 0.5 — only matters if latency is OK
+// Risk 0.5 - only matters if latency is OK
 protocol.addTask(
 	async (ctx: TaskContextInterface) => {
 		const maxConnections = 100;
@@ -74,7 +74,7 @@ protocol.addTask(
 	},
 );
 
-// Risk 0.3 — only if everything else survived
+// Risk 0.3 - only if everything else survived
 protocol.addTask(
 	async (ctx: TaskContextInterface) => {
 		const rollbackSuccess = true;

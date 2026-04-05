@@ -4,7 +4,7 @@ import { CONSTRAINTS_FILENAME, PATTERNS_FILENAME, type Pattern } from "@thecharg
 import { readJsonl, writeJsonl } from "./jsonl";
 
 /**
- * Long-term memory — institutional patterns that survive forever.
+ * Long-term memory - institutional patterns that survive forever.
  *
  * Stored as JSONL in `.sndv/memory/patterns.jsonl`.
  * Cross-hypothesis. "Every Redis test fails under 100k req/s."
